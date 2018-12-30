@@ -1,0 +1,38 @@
+{
+  "name": "marrakech",
+  "version": "0.1.0",
+  "description": "Back-end for the online version of the boardgame",
+  "main": "bin/server.js",
+  "scripts": {
+    "start": "node bin/server.js",
+    "test": "ava",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "marrakech"
+  ],
+  "author": "petermccallauway",
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "eslint": "^4.5.0",
+    "eslint-config-airbnb-base": "^11.3.2",
+    "eslint-plugin-import": "^2.7.0",
+    "socket.io-client": "^2.1.1",
+    "supertest": "^3.0.0",
+    "supertest-koa-agent": "^0.3.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "bson-objectid": "^1.1.5",
+    "config": "^1.26.2",
+    "koa": "^2.3.0",
+    "koa-better-body": "^3.0.4",
+    "koa-body": "^2.3.0",
+    "koa-mongoose": "^2.0.0",
+    "koa-router": "^7.2.1",
+    "lodash": "^4.17.4",
+    "mongoose": "^4.11.9",
+    "socket.io": "^2.0.3"
+  }
+}
