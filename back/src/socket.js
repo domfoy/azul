@@ -23,7 +23,8 @@ function formatGame(game) {
   console.log('game created', game.pendingAction);
 
   const formattedGame = _.pick(game, [
-    'pendingAction'
+    'pendingAction',
+    'factories'
   ]);
   return formattedGame;
 }
