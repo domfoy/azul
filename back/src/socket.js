@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const {init: initGame} = require('../game');
+const {init: initGame} = require('./game');
 
 function socketHandler(io) {
   if (!io) {

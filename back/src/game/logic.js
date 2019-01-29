@@ -157,7 +157,7 @@ function findWallTileColumn(patternLineId, tileColour) {
 
 function prepareRound(game) {
   const shuffled = _.shuffle(game.bag);
-  const buckets = _.splice(_.chunk(shuffled, 4), 0, 5);
+  const buckets = _.slice(_.chunk(shuffled, 4), 0, 5);
   const factories = _.union({
     id: 0,
     tiles: [0]

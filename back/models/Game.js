@@ -32,6 +32,7 @@ module.exports = function registerGame() {
     players: {
       type: [{
         id: {type: Number, min: 1, max: MAX_PLAYERS},
+        hasOne: Boolean,
         score: Number,
         patternLines: {
           type: {
@@ -50,9 +51,7 @@ module.exports = function registerGame() {
           line: Number,
           col: Number
         }]
-      }],
-      required: true,
-      validate: v => v.length >= MIN_PLAYERS && v.length <= 4
+      }]
     }
   }, {
     usePushEach: true,

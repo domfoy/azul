@@ -22,6 +22,7 @@ async function init() {
 
   prepareRound(game);
   await game.save({context: 'document'});
+  console.log('le jeu', JSON.stringify(game, null, 2));
 
   return game;
 }
@@ -29,7 +30,7 @@ async function init() {
 function initBag() {
   const array = [];
   for (let i = 1; i <= 100; i++) {
-    array[i] = i;
+    array[i-1] = i;
   }
 
   return array;

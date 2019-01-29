@@ -1,4 +1,4 @@
-port module Main exposing (Game, Model, Msg(..), createSocket, decodeGame, gameCreated, gameDecoder, init, main, subscriptions, update, view, viewGame)
+port module Main exposing (createSocket, gameCreated)
 
 import Array exposing (Array)
 import Browser
@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode
 import Json.Decode.Pipeline as PipelineDecoder
+import List
 
 
 type Colour
@@ -92,11 +93,30 @@ viewGame : Maybe Game -> List (Html Msg)
 viewGame maybeGame =
     case maybeGame of
         Just game ->
-            [ p [] [ text (game.factories |> Array.length |> String.fromInt) ]
+            [ main_ []
+                [ viewFactories (Array.slice 0 2 game.factories) "left_factories"
+                ]
             ]
 
         Nothing ->
             [ text "nothing yet" ]
+
+
+viewFactories factories htmlId =
+    section [ id htmlId, class "factories" ]
+        [ div [ class "factory" ]
+            [ div [ class "inner_factory" ]
+                (Array.map
+                    viewFactory
+                    factories
+                    |> Array.toList
+                )
+            ]
+        ]
+
+
+viewFactory factory =
+    div [ class "factory-spot" ] []
 
 
 decodeGame : Json.Decode.Value -> Result Json.Decode.Error Game
