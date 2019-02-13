@@ -24,6 +24,20 @@ type alias Tile =
     }
 
 
+type alias PatternSpot =
+    { index : Int
+    , colour : Maybe Colour
+    }
+
+
+type alias PatternLine =
+    Array PatternSpot
+
+
+type alias PatternLines =
+    Array PatternLine
+
+
 type alias Factory =
     { id : Int
     , tiles : Array Tile
@@ -32,6 +46,7 @@ type alias Factory =
 
 type alias Game =
     { factories : Array Factory
+    , patternLines : PatternLines
     }
 
 
@@ -94,7 +109,9 @@ viewGame maybeGame =
     case maybeGame of
         Just game ->
             [ main_ []
-                [ viewFactories (Array.slice 0 2 game.factories) "left_factories"
+                [ viewFactories (Array.slice 0 3 game.factories) "left_factories"
+                , viewMainBoard game
+                , viewFactories (Array.slice 3 5 game.factories) "right_factories"
                 ]
             ]
 
@@ -102,21 +119,86 @@ viewGame maybeGame =
             [ text "nothing yet" ]
 
 
-viewFactories factories htmlId =
-    section [ id htmlId, class "factories" ]
-        [ div [ class "factory" ]
-            [ div [ class "inner_factory" ]
-                (Array.map
-                    viewFactory
-                    factories
-                    |> Array.toList
-                )
-            ]
+viewMainBoard game =
+    section [ id "main_board" ]
+        [ div [ id "upper_main_board" ]
+            [ viewPatternLines game.patternLines ]
         ]
 
 
+viewFactories factories htmlId =
+    section [ id htmlId, class "factories" ]
+        (Array.map
+            viewFactory
+            factories
+            |> Array.toList
+        )
+
+
 viewFactory factory =
-    div [ class "factory-spot" ] []
+    div [ class "factory" ]
+        [ div [ class "inner_factory" ]
+            (Array.map
+                viewTile
+                factory.tiles
+                |> Array.toList
+            )
+        ]
+
+
+viewPatternLines patternLines =
+    div [ id "pattern_lines" ]
+        (Array.map
+            viewPatternLine
+            patternLines
+            |> Array.toList
+        )
+
+
+viewPatternLine patternLine =
+    div [ class "pattern_line" ]
+        (Array.map
+            viewPatternSpot
+            patternLine
+            |> Array.toList
+        )
+
+
+viewPatternSpot patternSpot =
+    div [ class "pattern_spot" ]
+        [ case patternSpot.colour of
+            Just colour ->
+                div [ class "tile" ] [ text (colourToString colour) ]
+
+            Nothing ->
+                div [] []
+        ]
+
+
+viewTile tile =
+    div [ class "factory_spot" ] [ text (colourFromTile tile) ]
+
+
+colourFromTile tile =
+    colourToString tile.colour
+
+
+colourToString colour =
+    case colour of
+        Bu ->
+            "Bu"
+
+        Y ->
+            "Y"
+
+        R ->
+            "R"
+
+        Ba ->
+            "Ba"
+
+        W ->
+            "W"
 
 
 decodeGame : Json.Decode.Value -> Result Json.Decode.Error Game
@@ -128,6 +210,7 @@ gameDecoder : Json.Decode.Decoder Game
 gameDecoder =
     Json.Decode.succeed Game
         |> PipelineDecoder.required "factories" (Json.Decode.array factoryDecoder)
+        |> PipelineDecoder.required "patternLines" (Json.Decode.array (Json.Decode.array patternSpotDecoder))
 
 
 factoryDecoder : Json.Decode.Decoder Factory
@@ -135,6 +218,13 @@ factoryDecoder =
     Json.Decode.succeed Factory
         |> PipelineDecoder.required "id" Json.Decode.int
         |> PipelineDecoder.required "tiles" (Json.Decode.array tileDecoder)
+
+
+patternSpotDecoder : Json.Decode.Decoder PatternSpot
+patternSpotDecoder =
+    Json.Decode.succeed PatternSpot
+        |> PipelineDecoder.required "index" Json.Decode.int
+        |> PipelineDecoder.required "colour" (Json.Decode.maybe colourDecoder)
 
 
 tileDecoder : Json.Decode.Decoder Tile

@@ -4842,9 +4842,10 @@ var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			A2(elm$json$Json$Decode$field, key, valDecoder),
 			decoder);
 	});
-var author$project$Main$Game = function (factories) {
-	return {factories: factories};
-};
+var author$project$Main$Game = F2(
+	function (factories, patternLines) {
+		return {factories: factories, patternLines: patternLines};
+	});
 var author$project$Main$Factory = F2(
 	function (id, tiles) {
 		return {id: id, tiles: tiles};
@@ -4902,11 +4903,39 @@ var author$project$Main$factoryDecoder = A3(
 		'id',
 		elm$json$Json$Decode$int,
 		elm$json$Json$Decode$succeed(author$project$Main$Factory)));
+var author$project$Main$PatternSpot = F2(
+	function (index, colour) {
+		return {colour: colour, index: index};
+	});
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$oneOf = _Json_oneOf;
+var elm$json$Json$Decode$maybe = function (decoder) {
+	return elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, decoder),
+				elm$json$Json$Decode$succeed(elm$core$Maybe$Nothing)
+			]));
+};
+var author$project$Main$patternSpotDecoder = A3(
+	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'colour',
+	elm$json$Json$Decode$maybe(author$project$Main$colourDecoder),
+	A3(
+		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'index',
+		elm$json$Json$Decode$int,
+		elm$json$Json$Decode$succeed(author$project$Main$PatternSpot)));
 var author$project$Main$gameDecoder = A3(
 	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'factories',
-	elm$json$Json$Decode$array(author$project$Main$factoryDecoder),
-	elm$json$Json$Decode$succeed(author$project$Main$Game));
+	'patternLines',
+	elm$json$Json$Decode$array(
+		elm$json$Json$Decode$array(author$project$Main$patternSpotDecoder)),
+	A3(
+		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'factories',
+		elm$json$Json$Decode$array(author$project$Main$factoryDecoder),
+		elm$json$Json$Decode$succeed(author$project$Main$Game)));
 var elm$json$Json$Decode$decodeValue = _Json_run;
 var author$project$Main$decodeGame = elm$json$Json$Decode$decodeValue(author$project$Main$gameDecoder);
 var elm$json$Json$Decode$value = _Json_decodeValue;
@@ -4949,10 +4978,26 @@ var author$project$Main$update = F2(
 		}
 	});
 var author$project$Main$JoinGame = {$: 'JoinGame'};
+var author$project$Main$colourToString = function (colour) {
+	switch (colour.$) {
+		case 'Bu':
+			return 'Bu';
+		case 'Y':
+			return 'Y';
+		case 'R':
+			return 'R';
+		case 'Ba':
+			return 'Ba';
+		default:
+			return 'W';
+	}
+};
+var author$project$Main$colourFromTile = function (tile) {
+	return author$project$Main$colourToString(tile.colour);
+};
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
-var elm$json$Json$Decode$map = _Json_map1;
 var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	switch (handler.$) {
 		case 'Normal':
@@ -4966,6 +5011,8 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	}
 };
 var elm$html$Html$div = _VirtualDom_node('div');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var elm$json$Json$Encode$string = _Json_wrap;
 var elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -4975,14 +5022,18 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
-var author$project$Main$viewFactory = function (factory) {
+var author$project$Main$viewTile = function (tile) {
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				elm$html$Html$Attributes$class('factory-spot')
+				elm$html$Html$Attributes$class('factory_spot')
 			]),
-		_List_Nil);
+		_List_fromArray(
+			[
+				elm$html$Html$text(
+				author$project$Main$colourFromTile(tile))
+			]));
 };
 var elm$core$Elm$JsArray$map = _JsArray_map;
 var elm$core$Array$map = F2(
@@ -5009,6 +5060,25 @@ var elm$core$Array$map = F2(
 			A2(elm$core$Elm$JsArray$map, helper, tree),
 			A2(elm$core$Elm$JsArray$map, func, tail));
 	});
+var author$project$Main$viewFactory = function (factory) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('factory')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('inner_factory')
+					]),
+				elm$core$Array$toList(
+					A2(elm$core$Array$map, author$project$Main$viewTile, factory.tiles)))
+			]));
+};
 var elm$html$Html$section = _VirtualDom_node('section');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
 var author$project$Main$viewFactories = F2(
@@ -5020,27 +5090,80 @@ var author$project$Main$viewFactories = F2(
 					elm$html$Html$Attributes$id(htmlId),
 					elm$html$Html$Attributes$class('factories')
 				]),
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$div,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('factory')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							elm$html$Html$div,
-							_List_fromArray(
-								[
-									elm$html$Html$Attributes$class('inner_factory')
-								]),
-							elm$core$Array$toList(
-								A2(elm$core$Array$map, author$project$Main$viewFactory, factories)))
-						]))
-				]));
+			elm$core$Array$toList(
+				A2(elm$core$Array$map, author$project$Main$viewFactory, factories)));
 	});
+var author$project$Main$viewPatternSpot = function (patternSpot) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('pattern_spot')
+			]),
+		_List_fromArray(
+			[
+				function () {
+				var _n0 = patternSpot.colour;
+				if (_n0.$ === 'Just') {
+					var colour = _n0.a;
+					return A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('tile')
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text(
+								author$project$Main$colourToString(colour))
+							]));
+				} else {
+					return A2(elm$html$Html$div, _List_Nil, _List_Nil);
+				}
+			}()
+			]));
+};
+var author$project$Main$viewPatternLine = function (patternLine) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('pattern_line')
+			]),
+		elm$core$Array$toList(
+			A2(elm$core$Array$map, author$project$Main$viewPatternSpot, patternLine)));
+};
+var author$project$Main$viewPatternLines = function (patternLines) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$id('pattern_lines')
+			]),
+		elm$core$Array$toList(
+			A2(elm$core$Array$map, author$project$Main$viewPatternLine, patternLines)));
+};
+var author$project$Main$viewMainBoard = function (game) {
+	return A2(
+		elm$html$Html$section,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$id('main_board')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$id('upper_main_board')
+					]),
+				_List_fromArray(
+					[
+						author$project$Main$viewPatternLines(game.patternLines)
+					]))
+			]));
+};
 var elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var elm$core$Elm$JsArray$slice = _JsArray_slice;
 var elm$core$Array$appendHelpBuilder = F2(
@@ -5275,8 +5398,6 @@ var elm$core$Array$slice = F3(
 			A2(elm$core$Array$sliceRight, correctTo, array));
 	});
 var elm$html$Html$main_ = _VirtualDom_node('main');
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var author$project$Main$viewGame = function (maybeGame) {
 	if (maybeGame.$ === 'Just') {
 		var game = maybeGame.a;
@@ -5289,8 +5410,13 @@ var author$project$Main$viewGame = function (maybeGame) {
 					[
 						A2(
 						author$project$Main$viewFactories,
-						A3(elm$core$Array$slice, 0, 2, game.factories),
-						'left_factories')
+						A3(elm$core$Array$slice, 0, 3, game.factories),
+						'left_factories'),
+						author$project$Main$viewMainBoard(game),
+						A2(
+						author$project$Main$viewFactories,
+						A3(elm$core$Array$slice, 3, 5, game.factories),
+						'right_factories')
 					]))
 			]);
 	} else {

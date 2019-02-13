@@ -13,6 +13,7 @@
     "prod:analyze": "npm run prod -- --env.presets analyze",
     "prod:compress": "npm run prod -- --env.presets compress",
     "dev": "npm run webpack-dev-server -- --env.mode development",
+    "hot": "elm-live src/elm/Main.elm --  --output main.js",
     "dashboard-dev": "webpack-dashboard --title 'Elm Dev Server' -- npm run webpack-dev-server -- --env.mode development",
     "elm-analyse": "elm-analyse -s -o",
     "preprod": "rimraf dist",
