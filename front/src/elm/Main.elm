@@ -224,7 +224,7 @@ patternSpotDecoder : Json.Decode.Decoder PatternSpot
 patternSpotDecoder =
     Json.Decode.succeed PatternSpot
         |> PipelineDecoder.required "index" Json.Decode.int
-        |> PipelineDecoder.required "colour" (Json.Decode.maybe colourDecoder)
+        |> PipelineDecoder.required "colour" (Json.Decode.nullable colourDecoder)
 
 
 tileDecoder : Json.Decode.Decoder Tile

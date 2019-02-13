@@ -1,6 +1,7 @@
-const _ = require('lodash');
-
-const {init: initGame} = require('./game');
+const {
+  init: initGame,
+  formatGame
+} = require('./game');
 
 function socketHandler(io) {
   if (!io) {
@@ -17,16 +18,6 @@ async function handleConnection(socket) {
   socket.emit('game_created', formatGame(game));
 
   socket.on('action_submitted', handleActionSubmitted.bind(null, socket, game));
-}
-
-function formatGame(game) {
-  console.log('game created', game.pendingAction);
-
-  const formattedGame = _.pick(game, [
-    'pendingAction',
-    'factories'
-  ]);
-  return formattedGame;
 }
 
 async function handleActionSubmitted(socket, game, actionSubmission) {
