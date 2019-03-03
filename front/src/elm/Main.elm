@@ -25,28 +25,33 @@ type alias Tile =
     }
 
 
-type alias PatternSpot =
-    { index : Int
-    }
-
-
-type alias PatternLine =
-    Array (Maybe PatternSpot)
-
-
-type alias PatternLines =
-    Array PatternLine
-
-
 type alias Factory =
     { id : Int
     , tiles : Array Tile
     }
 
 
+type alias Spot =
+    { index : Int
+    }
+
+
+type alias SpotLine =
+    Array (Maybe Spot)
+
+
+type alias PatternLines =
+    Array SpotLine
+
+
+type alias Wall =
+    Array (Maybe Spot)
+
+
 type alias Game =
     { factories : Array Factory
     , patternLines : PatternLines
+    , wall : Wall
     }
 
 
@@ -122,7 +127,9 @@ viewGame maybeGame =
 viewMainBoard game =
     section [ id "main_board" ]
         [ div [ id "upper_main_board" ]
-            [ viewPatternLines game.patternLines ]
+            [ viewPatternLines game.patternLines
+            , viewWall game.wall
+            ]
         ]
 
 
@@ -175,6 +182,26 @@ viewPatternSpot patternSpot =
         ]
 
 
+viewWall wall =
+    div [ id "wall" ]
+        (Array.map
+            viewWallSpot
+            wall
+            |> Array.toList
+        )
+
+
+viewWallSpot wallSpot =
+    div [ class "wall_spot" ]
+        [ case wallSpot of
+            Just { index } ->
+                div [ class "tile" ] [ text (String.fromInt index) ]
+
+            Nothing ->
+                div [] []
+        ]
+
+
 viewTile tile =
     div [ class "factory_spot" ] [ text (colourFromTile tile) ]
 
@@ -210,7 +237,8 @@ gameDecoder : D.Decoder Game
 gameDecoder =
     D.succeed Game
         |> PipelineDecoder.required "factories" (D.array factoryDecoder)
-        |> PipelineDecoder.required "patternLines" (D.array (D.array (D.nullable patternSpotDecoder)))
+        |> PipelineDecoder.required "patternLines" (D.array (D.array (D.nullable spotDecoder)))
+        |> PipelineDecoder.required "wall" (D.array (D.nullable spotDecoder))
 
 
 factoryDecoder : D.Decoder Factory
@@ -220,9 +248,9 @@ factoryDecoder =
         |> PipelineDecoder.required "tiles" (D.array tileDecoder)
 
 
-patternSpotDecoder : D.Decoder PatternSpot
-patternSpotDecoder =
-    D.succeed PatternSpot
+spotDecoder : D.Decoder Spot
+spotDecoder =
+    D.succeed Spot
         |> PipelineDecoder.required "index" D.int
 
 

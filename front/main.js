@@ -4842,9 +4842,9 @@ var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			A2(elm$json$Json$Decode$field, key, valDecoder),
 			decoder);
 	});
-var author$project$Main$Game = F2(
-	function (factories, patternLines) {
-		return {factories: factories, patternLines: patternLines};
+var author$project$Main$Game = F3(
+	function (factories, patternLines, wall) {
+		return {factories: factories, patternLines: patternLines, wall: wall};
 	});
 var author$project$Main$Factory = F2(
 	function (id, tiles) {
@@ -4903,10 +4903,14 @@ var author$project$Main$factoryDecoder = A3(
 		'id',
 		elm$json$Json$Decode$int,
 		elm$json$Json$Decode$succeed(author$project$Main$Factory)));
-var author$project$Main$PatternSpot = F2(
-	function (index, colour) {
-		return {colour: colour, index: index};
-	});
+var author$project$Main$Spot = function (index) {
+	return {index: index};
+};
+var author$project$Main$spotDecoder = A3(
+	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'index',
+	elm$json$Json$Decode$int,
+	elm$json$Json$Decode$succeed(author$project$Main$Spot));
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$null = _Json_decodeNull;
 var elm$json$Json$Decode$oneOf = _Json_oneOf;
@@ -4918,27 +4922,26 @@ var elm$json$Json$Decode$nullable = function (decoder) {
 				A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, decoder)
 			]));
 };
-var author$project$Main$patternSpotDecoder = A3(
-	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'colour',
-	elm$json$Json$Decode$nullable(author$project$Main$colourDecoder),
-	A3(
-		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'index',
-		elm$json$Json$Decode$int,
-		elm$json$Json$Decode$succeed(author$project$Main$PatternSpot)));
 var author$project$Main$gameDecoder = A3(
 	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'patternLines',
+	'wall',
 	elm$json$Json$Decode$array(
-		elm$json$Json$Decode$array(author$project$Main$patternSpotDecoder)),
+		elm$json$Json$Decode$nullable(author$project$Main$spotDecoder)),
 	A3(
 		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'factories',
-		elm$json$Json$Decode$array(author$project$Main$factoryDecoder),
-		elm$json$Json$Decode$succeed(author$project$Main$Game)));
+		'patternLines',
+		elm$json$Json$Decode$array(
+			elm$json$Json$Decode$array(
+				elm$json$Json$Decode$nullable(author$project$Main$spotDecoder))),
+		A3(
+			NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'factories',
+			elm$json$Json$Decode$array(author$project$Main$factoryDecoder),
+			elm$json$Json$Decode$succeed(author$project$Main$Game))));
 var elm$json$Json$Decode$decodeValue = _Json_run;
-var author$project$Main$decodeGame = elm$json$Json$Decode$decodeValue(author$project$Main$gameDecoder);
+var author$project$Main$decodeGame = function (value) {
+	return A2(elm$json$Json$Decode$decodeValue, author$project$Main$gameDecoder, value);
+};
 var elm$json$Json$Decode$value = _Json_decodeValue;
 var author$project$Main$gameCreated = _Platform_incomingPort('gameCreated', elm$json$Json$Decode$value);
 var elm$core$Basics$composeR = F3(
@@ -4946,7 +4949,7 @@ var elm$core$Basics$composeR = F3(
 		return g(
 			f(x));
 	});
-var author$project$Main$subscriptions = function (_n0) {
+var author$project$Main$subscriptions = function (model) {
 	return author$project$Main$gameCreated(
 		A2(elm$core$Basics$composeR, author$project$Main$decodeGame, author$project$Main$NewGame));
 };
@@ -5104,9 +5107,8 @@ var author$project$Main$viewPatternSpot = function (patternSpot) {
 		_List_fromArray(
 			[
 				function () {
-				var _n0 = patternSpot.colour;
-				if (_n0.$ === 'Just') {
-					var colour = _n0.a;
+				if (patternSpot.$ === 'Just') {
+					var index = patternSpot.a.index;
 					return A2(
 						elm$html$Html$div,
 						_List_fromArray(
@@ -5116,7 +5118,7 @@ var author$project$Main$viewPatternSpot = function (patternSpot) {
 						_List_fromArray(
 							[
 								elm$html$Html$text(
-								author$project$Main$colourToString(colour))
+								elm$core$String$fromInt(index))
 							]));
 				} else {
 					return A2(elm$html$Html$div, _List_Nil, _List_Nil);
@@ -5144,6 +5146,45 @@ var author$project$Main$viewPatternLines = function (patternLines) {
 		elm$core$Array$toList(
 			A2(elm$core$Array$map, author$project$Main$viewPatternLine, patternLines)));
 };
+var author$project$Main$viewWallSpot = function (wallSpot) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('wall_spot')
+			]),
+		_List_fromArray(
+			[
+				function () {
+				if (wallSpot.$ === 'Just') {
+					var index = wallSpot.a.index;
+					return A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('tile')
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text(
+								elm$core$String$fromInt(index))
+							]));
+				} else {
+					return A2(elm$html$Html$div, _List_Nil, _List_Nil);
+				}
+			}()
+			]));
+};
+var author$project$Main$viewWall = function (wall) {
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$id('wall')
+			]),
+		elm$core$Array$toList(
+			A2(elm$core$Array$map, author$project$Main$viewWallSpot, wall)));
+};
 var author$project$Main$viewMainBoard = function (game) {
 	return A2(
 		elm$html$Html$section,
@@ -5161,7 +5202,8 @@ var author$project$Main$viewMainBoard = function (game) {
 					]),
 				_List_fromArray(
 					[
-						author$project$Main$viewPatternLines(game.patternLines)
+						author$project$Main$viewPatternLines(game.patternLines),
+						author$project$Main$viewWall(game.wall)
 					]))
 			]));
 };

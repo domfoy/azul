@@ -4,18 +4,27 @@ const {
   COLOURS
 } = require('../../models');
 
+const EMPTY_WALL = [
+  null, null, null, null, null,
+  null, null, null, null, null,
+  null, null, null, null, null,
+  null, null, null, null, null,
+  null, null, null, null, null
+];
+
 function formatGame(game) {
   console.log('game created', game.pendingAction);
 
   return {
     pendingAction: game.pendingAction,
     factories: formatFactories(game.factories),
-    patternLines: formatPatternLines(game)
+    patternLines: formatPatternLines(game.players[0].patternLines),
+    wall: formatWall(game.players[0].wall)
   };
 }
 
-function formatPatternLines(game) {
-  return _.map(_.values(game.players[0].patternLines), formatPatternLine);
+function formatPatternLines(patternLines) {
+  return _.map(_.values(patternLines), formatPatternLine);
 }
 
 function formatPatternLine(patternLine) {
@@ -46,6 +55,16 @@ function getTileColour(tileId) {
   }
 
   return COLOURS[Math.floor((tileId - 1) / 20)];
+}
+
+function formatWall(wall) {
+  const res = EMPTY_WALL;
+
+  for (const {line, col, index} of wall) {
+    res[((line - 1) * 5) + (col - 1)] = {index};
+  }
+
+  return res;
 }
 
 module.exports = {formatGame};
