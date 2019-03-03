@@ -15,7 +15,19 @@ function formatGame(game) {
 }
 
 function formatPatternLines(game) {
-  return _.map(_.values(game.players[0].patternLines), patternLine => _.map(patternLine, getTileColour));
+  return _.map(_.values(game.players[0].patternLines), formatPatternLine);
+}
+
+function formatPatternLine(patternLine) {
+  return _.map(patternLine, (patternSpotIndex) => {
+    if (!patternSpotIndex) {
+      return null;
+    }
+
+    return {
+      index: patternSpotIndex
+    };
+  });
 }
 
 function formatFactories(factories) {

@@ -5,8 +5,9 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Json.Decode
+import Json.Decode as D
 import Json.Decode.Pipeline as PipelineDecoder
+import Json.Encode as E
 import List
 
 
@@ -26,12 +27,11 @@ type alias Tile =
 
 type alias PatternSpot =
     { index : Int
-    , colour : Maybe Colour
     }
 
 
 type alias PatternLine =
-    Array PatternSpot
+    Array (Maybe PatternSpot)
 
 
 type alias PatternLines =
@@ -57,7 +57,7 @@ type alias Model =
 
 type Msg
     = JoinGame
-    | NewGame (Result Json.Decode.Error Game)
+    | NewGame (Result D.Error Game)
 
 
 init : () -> ( Model, Cmd Msg )
@@ -68,11 +68,11 @@ init =
 port createSocket : () -> Cmd msg
 
 
-port gameCreated : (Json.Decode.Value -> msg) -> Sub msg
+port gameCreated : (E.Value -> msg) -> Sub msg
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     gameCreated (decodeGame >> NewGame)
 
 
@@ -166,9 +166,9 @@ viewPatternLine patternLine =
 
 viewPatternSpot patternSpot =
     div [ class "pattern_spot" ]
-        [ case patternSpot.colour of
-            Just colour ->
-                div [ class "tile" ] [ text (colourToString colour) ]
+        [ case patternSpot of
+            Just { index } ->
+                div [ class "tile" ] [ text (String.fromInt index) ]
 
             Nothing ->
                 div [] []
@@ -201,62 +201,61 @@ colourToString colour =
             "W"
 
 
-decodeGame : Json.Decode.Value -> Result Json.Decode.Error Game
-decodeGame =
-    Json.Decode.decodeValue gameDecoder
+decodeGame : D.Value -> Result D.Error Game
+decodeGame value =
+    D.decodeValue gameDecoder value
 
 
-gameDecoder : Json.Decode.Decoder Game
+gameDecoder : D.Decoder Game
 gameDecoder =
-    Json.Decode.succeed Game
-        |> PipelineDecoder.required "factories" (Json.Decode.array factoryDecoder)
-        |> PipelineDecoder.required "patternLines" (Json.Decode.array (Json.Decode.array patternSpotDecoder))
+    D.succeed Game
+        |> PipelineDecoder.required "factories" (D.array factoryDecoder)
+        |> PipelineDecoder.required "patternLines" (D.array (D.array (D.nullable patternSpotDecoder)))
 
 
-factoryDecoder : Json.Decode.Decoder Factory
+factoryDecoder : D.Decoder Factory
 factoryDecoder =
-    Json.Decode.succeed Factory
-        |> PipelineDecoder.required "id" Json.Decode.int
-        |> PipelineDecoder.required "tiles" (Json.Decode.array tileDecoder)
+    D.succeed Factory
+        |> PipelineDecoder.required "id" D.int
+        |> PipelineDecoder.required "tiles" (D.array tileDecoder)
 
 
-patternSpotDecoder : Json.Decode.Decoder PatternSpot
+patternSpotDecoder : D.Decoder PatternSpot
 patternSpotDecoder =
-    Json.Decode.succeed PatternSpot
-        |> PipelineDecoder.required "index" Json.Decode.int
-        |> PipelineDecoder.required "colour" (Json.Decode.nullable colourDecoder)
+    D.succeed PatternSpot
+        |> PipelineDecoder.required "index" D.int
 
 
-tileDecoder : Json.Decode.Decoder Tile
+tileDecoder : D.Decoder Tile
 tileDecoder =
-    Json.Decode.succeed Tile
-        |> PipelineDecoder.required "id" Json.Decode.int
+    D.succeed Tile
+        |> PipelineDecoder.required "id" D.int
         |> PipelineDecoder.required "colour" colourDecoder
 
 
-colourDecoder : Json.Decode.Decoder Colour
+colourDecoder : D.Decoder Colour
 colourDecoder =
-    Json.Decode.string
-        |> Json.Decode.andThen
+    D.string
+        |> D.andThen
             (\str ->
                 case str of
                     "Bu" ->
-                        Json.Decode.succeed Bu
+                        D.succeed Bu
 
                     "Y" ->
-                        Json.Decode.succeed Y
+                        D.succeed Y
 
                     "R" ->
-                        Json.Decode.succeed R
+                        D.succeed R
 
                     "Ba" ->
-                        Json.Decode.succeed Ba
+                        D.succeed Ba
 
                     "W" ->
-                        Json.Decode.succeed W
+                        D.succeed W
 
                     otherValue ->
-                        Json.Decode.fail <| "Unknown colour: " ++ otherValue
+                        D.fail <| "Unknown colour: " ++ otherValue
             )
 
 
