@@ -19,7 +19,8 @@ function formatGame(game) {
     pendingAction: game.pendingAction,
     factories: formatFactories(game.factories),
     patternLines: formatPatternLines(game.players[0].patternLines),
-    wall: formatWall(game.players[0].wall)
+    wall: formatWall(game.players[0].wall),
+    opponentBoards: formatOpponentBoards(_.slice(game.players, 1))
   };
 }
 
@@ -67,4 +68,15 @@ function formatWall(wall) {
   return res;
 }
 
-module.exports = {formatGame};
+function formatOpponentBoards(opponents) {
+  return _.map(opponents, formatOpponentBoard);
+}
+
+function formatOpponentBoard(opponent) {
+  return {
+    patternLines: formatPatternLines(opponent.patternLines),
+    wall: formatWall(opponent.wall),
+  };
+}
+
+module.exports = formatGame;

@@ -4,15 +4,13 @@ const {
   prepareRound
 } = require('./logic');
 
-module.exports = {
-  init
-};
+module.exports = init;
 
-async function init() {
+function init() {
   const game = new Game({
     playerCount: 2,
     pendingAction: {
-      roundId: 0,
+      roundId: 1,
       playerId: 1
     },
     factories: [],
@@ -20,7 +18,7 @@ async function init() {
     players: initPlayers()
   });
   prepareRound(game);
-  await game.save({context: 'document'});
+  // await game.save({context: 'document'});
   console.log('le jeu', JSON.stringify(game, null, 2));
 
   return game;

@@ -48,10 +48,17 @@ type alias Wall =
     Array (Maybe Spot)
 
 
+type alias OpponentBoard =
+    { patternLines : PatternLines
+    , wall : Wall
+    }
+
+
 type alias Game =
     { factories : Array Factory
     , patternLines : PatternLines
     , wall : Wall
+    , opponentBoards : Array OpponentBoard
     }
 
 
@@ -113,7 +120,10 @@ viewGame : Maybe Game -> List (Html Msg)
 viewGame maybeGame =
     case maybeGame of
         Just game ->
-            [ main_ []
+            [ aside [ id "opponent_boards" ]
+                (viewOpponentBoards game.opponentBoards)
+            , main_
+                []
                 [ viewFactories (Array.slice 0 3 game.factories) "left_factories"
                 , viewMainBoard game
                 , viewFactories (Array.slice 3 5 game.factories) "right_factories"
@@ -122,6 +132,22 @@ viewGame maybeGame =
 
         Nothing ->
             [ text "nothing yet" ]
+
+
+viewOpponentBoards opponentBoards =
+    Array.map
+        viewOpponentBoard
+        opponentBoards
+        |> Array.toList
+
+
+viewOpponentBoard opponentBoard =
+    section []
+        [ div [ id "upper_main_board" ]
+            [ viewPatternLines opponentBoard.patternLines
+            , viewWall opponentBoard.wall
+            ]
+        ]
 
 
 viewMainBoard game =
@@ -237,8 +263,23 @@ gameDecoder : D.Decoder Game
 gameDecoder =
     D.succeed Game
         |> PipelineDecoder.required "factories" (D.array factoryDecoder)
-        |> PipelineDecoder.required "patternLines" (D.array (D.array (D.nullable spotDecoder)))
-        |> PipelineDecoder.required "wall" (D.array (D.nullable spotDecoder))
+        |> PipelineDecoder.required "patternLines" patternLinesDecoder
+        |> PipelineDecoder.required "wall" wallDecoder
+        |> PipelineDecoder.required "opponentBoards" (D.array opponentBoardDecoder)
+
+
+opponentBoardDecoder =
+    D.succeed OpponentBoard
+        |> PipelineDecoder.required "patternLines" patternLinesDecoder
+        |> PipelineDecoder.required "wall" wallDecoder
+
+
+patternLinesDecoder =
+    D.array (D.array (D.nullable spotDecoder))
+
+
+wallDecoder =
+    D.array (D.nullable spotDecoder)
 
 
 factoryDecoder : D.Decoder Factory

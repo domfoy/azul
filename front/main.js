@@ -4842,9 +4842,9 @@ var NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			A2(elm$json$Json$Decode$field, key, valDecoder),
 			decoder);
 	});
-var author$project$Main$Game = F3(
-	function (factories, patternLines, wall) {
-		return {factories: factories, patternLines: patternLines, wall: wall};
+var author$project$Main$Game = F4(
+	function (factories, patternLines, wall, opponentBoards) {
+		return {factories: factories, opponentBoards: opponentBoards, patternLines: patternLines, wall: wall};
 	});
 var author$project$Main$Factory = F2(
 	function (id, tiles) {
@@ -4903,6 +4903,10 @@ var author$project$Main$factoryDecoder = A3(
 		'id',
 		elm$json$Json$Decode$int,
 		elm$json$Json$Decode$succeed(author$project$Main$Factory)));
+var author$project$Main$OpponentBoard = F2(
+	function (patternLines, wall) {
+		return {patternLines: patternLines, wall: wall};
+	});
 var author$project$Main$Spot = function (index) {
 	return {index: index};
 };
@@ -4922,22 +4926,37 @@ var elm$json$Json$Decode$nullable = function (decoder) {
 				A2(elm$json$Json$Decode$map, elm$core$Maybe$Just, decoder)
 			]));
 };
-var author$project$Main$gameDecoder = A3(
+var author$project$Main$patternLinesDecoder = elm$json$Json$Decode$array(
+	elm$json$Json$Decode$array(
+		elm$json$Json$Decode$nullable(author$project$Main$spotDecoder)));
+var author$project$Main$wallDecoder = elm$json$Json$Decode$array(
+	elm$json$Json$Decode$nullable(author$project$Main$spotDecoder));
+var author$project$Main$opponentBoardDecoder = A3(
 	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 	'wall',
-	elm$json$Json$Decode$array(
-		elm$json$Json$Decode$nullable(author$project$Main$spotDecoder)),
+	author$project$Main$wallDecoder,
 	A3(
 		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 		'patternLines',
-		elm$json$Json$Decode$array(
-			elm$json$Json$Decode$array(
-				elm$json$Json$Decode$nullable(author$project$Main$spotDecoder))),
+		author$project$Main$patternLinesDecoder,
+		elm$json$Json$Decode$succeed(author$project$Main$OpponentBoard)));
+var author$project$Main$gameDecoder = A3(
+	NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'opponentBoards',
+	elm$json$Json$Decode$array(author$project$Main$opponentBoardDecoder),
+	A3(
+		NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'wall',
+		author$project$Main$wallDecoder,
 		A3(
 			NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-			'factories',
-			elm$json$Json$Decode$array(author$project$Main$factoryDecoder),
-			elm$json$Json$Decode$succeed(author$project$Main$Game))));
+			'patternLines',
+			author$project$Main$patternLinesDecoder,
+			A3(
+				NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'factories',
+				elm$json$Json$Decode$array(author$project$Main$factoryDecoder),
+				elm$json$Json$Decode$succeed(author$project$Main$Game)))));
 var elm$json$Json$Decode$decodeValue = _Json_run;
 var author$project$Main$decodeGame = function (value) {
 	return A2(elm$json$Json$Decode$decodeValue, author$project$Main$gameDecoder, value);
@@ -5207,6 +5226,29 @@ var author$project$Main$viewMainBoard = function (game) {
 					]))
 			]));
 };
+var author$project$Main$viewOpponentBoard = function (opponentBoard) {
+	return A2(
+		elm$html$Html$section,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$id('upper_main_board')
+					]),
+				_List_fromArray(
+					[
+						author$project$Main$viewPatternLines(opponentBoard.patternLines),
+						author$project$Main$viewWall(opponentBoard.wall)
+					]))
+			]));
+};
+var author$project$Main$viewOpponentBoards = function (opponentBoards) {
+	return elm$core$Array$toList(
+		A2(elm$core$Array$map, author$project$Main$viewOpponentBoard, opponentBoards));
+};
 var elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var elm$core$Elm$JsArray$slice = _JsArray_slice;
 var elm$core$Array$appendHelpBuilder = F2(
@@ -5440,12 +5482,20 @@ var elm$core$Array$slice = F3(
 			correctFrom,
 			A2(elm$core$Array$sliceRight, correctTo, array));
 	});
+var elm$html$Html$aside = _VirtualDom_node('aside');
 var elm$html$Html$main_ = _VirtualDom_node('main');
 var author$project$Main$viewGame = function (maybeGame) {
 	if (maybeGame.$ === 'Just') {
 		var game = maybeGame.a;
 		return _List_fromArray(
 			[
+				A2(
+				elm$html$Html$aside,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$id('opponent_boards')
+					]),
+				author$project$Main$viewOpponentBoards(game.opponentBoards)),
 				A2(
 				elm$html$Html$main_,
 				_List_Nil,

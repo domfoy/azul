@@ -1,7 +1,6 @@
-const {
-  init: initGame,
-  formatGame
-} = require('./game');
+const GameContext = require('./game');
+
+const RandomBot = require('./ia');
 
 function socketHandler(io) {
   if (!io) {
@@ -13,36 +12,32 @@ function socketHandler(io) {
 async function handleConnection(socket) {
   console.log('A user is connected');
 
-  const game = await initGame();
+  const bot = new RandomBot();
+  const ctx = await new GameContext([bot]);
 
-  socket.emit('game_created', formatGame(game));
+  socket.emit('game_created', ctx.displayGame());
 
-  socket.on('action_submitted', handleActionSubmitted.bind(null, socket, game));
+  socket.on('action_submitted', handleActionSubmitted.bind(null, socket, ctx));
 }
 
-async function handleActionSubmitted(socket, game, actionSubmission) {
+async function handleActionSubmitted(socket, ctx, actionSubmission) {
   console.log('action submission received', actionSubmission);
   try {
-    await game.applyAction(actionSubmission);
-    if (game.isOver()) {
-      socket.emit('game_over');
-    }
-    socket.emit('new_pending_action_set', formatNextActionContext(game));
+    await handleAction(socket, ctx, actionSubmission);
+
+    socket.emit('new_pending_action_set', ctx.formatNextActionContext());
   } catch (err) {
     socket.emit('action_submission_rejected', err);
     throw err;
   }
 }
 
-function formatNextActionContext(game) {
-  const context = {
-    pendingAction: {
-      turnId: game.pendingAction.turnId,
-      playerId: game.pendingAction.playerId
-    },
-    players: game.players
-  };
-  return context;
+async function handleAction(socket, ctx, actionSubmission) {
+  await ctx.applyAction(actionSubmission);
+
+  if (ctx.isGameOver()) {
+    socket.emit('game_over');
+  }
 }
 
 module.exports = socketHandler;

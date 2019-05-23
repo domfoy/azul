@@ -6,6 +6,11 @@ body {
   background-color: blue;
 }
 
+#opponent_boards {
+  display: flex;
+  justify-content: center;
+}
+
 main {
   display: flex;
   justify-content: center;

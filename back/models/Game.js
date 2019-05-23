@@ -64,11 +64,14 @@ module.exports = function registerGame() {
   gameSchema.methods.isOver = function _isOver() {
     return isOver(this);
   };
+  gameSchema.methods.getPhasis = function _isOver() {
+    return isOver(this);
+  };
   gameSchema.methods.prepareRound = function _prepareRound() {
     return prepareRound(this);
   };
-  gameSchema.methods.applyAction = function _applyAction(actionSubmission) {
-    return applyAction(this, actionSubmission);
+  gameSchema.methods.applyAction = function _applyAction(bots, actionSubmission) {
+    return applyAction(this, bots, actionSubmission);
   };
 
   mongoose.model('Game', gameSchema);

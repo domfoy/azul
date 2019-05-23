@@ -32,8 +32,17 @@ function isOver(game) {
   });
 }
 
-async function applyAction(game, {playerId, factoryId, colour, patternLineId}) {
+async function applyAction(game, bots, {playerId, factoryId, colour, patternLineId}) {
   playTiles(game, playerId, factoryId, colour, patternLineId);
+
+  if (!isFactoryOfferOver(game)) {
+    const nextPlayerId = game.pendingAction.playerId;
+    const nextPlayer = _.find(game.players, {id: nextPlayerId});
+
+    if (nextPlayer.isBot) {
+      const botActionSubmission = nextPlayer.selectAction(game);
+    }
+  }
 
   if (isFactoryOfferOver(game)) {
     tileWalls(game);
@@ -43,6 +52,10 @@ async function applyAction(game, {playerId, factoryId, colour, patternLineId}) {
   }
 
   await game.save({context: 'document'});
+}
+
+function getNextPlayer(game) {
+
 }
 
 function playTiles(game, playerId, factoryId, colour, patternLineId) {
@@ -58,6 +71,7 @@ function playTiles(game, playerId, factoryId, colour, patternLineId) {
   clearFactory(game, factory, player, tiles);
   putRemainingTilesIntoCenter(game, factory, remainingTiles);
   fillPatternLine(game, player, factory, patternLineId, tiles, oneTileIndex);
+  finishPlayerTurn(game);
 
   return {
     center: game.factories[0],
@@ -119,6 +133,17 @@ function putTilesIntoBag(game, tiles) {
   _.each(tiles, tile => game.bag.push(tile.index));
 
   game.bag = _.sort(game.bag);
+}
+
+function finishPlayerTurn(game) {
+  const currentPlayerId = game.pendingAction.playerId;
+
+  if (currentPlayerId === game.players.length) {
+    game.pendingAction.playerId = 1;
+    game.pendingAction.roundId++;
+  } else {
+    game.pendingAction.playerId++;
+  }
 }
 
 function isFactoryOfferOver(game) {
