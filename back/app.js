@@ -1,6 +1,6 @@
 const http = require('http');
 
-const io = require('socket.io');
+const WebSocket = require('ws');
 const Koa = require('koa');
 const Router = require('koa-router');
 
@@ -12,9 +12,13 @@ const router = new Router();
 router.get('/ping', (ctx) => {ctx.body = 'OK';});
 app.use(router.routes());
 
+const state = {
+  rooms: [],
+  users: []
+};
 const server = http.createServer(app.callback());
-const _io = io(server);
+const wss = new WebSocket.Server({server});
 
-socketHandler(_io);
+socketHandler(wss, state);
 
 module.exports = server;

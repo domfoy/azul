@@ -5,7 +5,7 @@ const _ = require('lodash');
 const {
   COLOURS,
   COLOURS_COUNT
-} = require('../../models');
+} = require('../../../models');
 
 const TILES = _.flatten(_.map(COLOURS, (colour, offset) => {
   const tiles = [];
@@ -32,8 +32,17 @@ function isOver(game) {
   });
 }
 
-async function applyAction(game, {playerId, factoryId, colour, patternLineId}) {
+async function applyAction(game, bots, {playerId, factoryId, colour, patternLineId}) {
   playTiles(game, playerId, factoryId, colour, patternLineId);
+
+  if (!isFactoryOfferOver(game)) {
+    const nextPlayerId = game.pendingAction.playerId;
+    const nextPlayer = _.find(game.players, {id: nextPlayerId});
+
+    if (nextPlayer.isBot) {
+      const botActionSubmission = nextPlayer.selectAction(game);
+    }
+  }
 
   if (isFactoryOfferOver(game)) {
     tileWalls(game);
@@ -58,6 +67,7 @@ function playTiles(game, playerId, factoryId, colour, patternLineId) {
   clearFactory(game, factory, player, tiles);
   putRemainingTilesIntoCenter(game, factory, remainingTiles);
   fillPatternLine(game, player, factory, patternLineId, tiles, oneTileIndex);
+  finishPlayerTurn(game);
 
   return {
     center: game.factories[0],
@@ -121,6 +131,17 @@ function putTilesIntoBag(game, tiles) {
   game.bag = _.sort(game.bag);
 }
 
+function finishPlayerTurn(game) {
+  const currentPlayerId = game.pendingAction.playerId;
+
+  if (currentPlayerId === game.players.length) {
+    game.pendingAction.playerId = 1;
+    game.pendingAction.roundId++;
+  } else {
+    game.pendingAction.playerId++;
+  }
+}
+
 function isFactoryOfferOver(game) {
   return _.every(game.factories, f => _.filter(f.tiles, t => t === null).length === 0);
 }
@@ -157,7 +178,7 @@ function findWallTileColumn(patternLineId, tileColour) {
 
 function prepareRound(game) {
   const shuffled = _.shuffle(game.bag);
-  const buckets = _.splice(_.chunk(shuffled, 4), 0, 5);
+  const buckets = _.slice(_.chunk(shuffled, 4), 0, 5);
   const factories = _.union({
     id: 0,
     tiles: [0]

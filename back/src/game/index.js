@@ -1,16 +1,3 @@
-require('../../register-models');
+const Game = require('./model');
 
-const {
-  isOver,
-  applyAction
-} = require('./logic');
-
-const {
-  init
-} = require('./init');
-
-module.exports = {
-  init,
-  isOver,
-  applyAction
-};
+module.exports = Game;
