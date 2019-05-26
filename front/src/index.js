@@ -1,17 +1,24 @@
-require('./assets/styles/main.scss');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
 
-const io = require('socket.io-client');
+import './index.css';
 
-// const {Elm} = require('./elm/Main.elm');
-const app = Elm.Main.init({
-    node: document.getElementById('elm-node')
-});
+import {PixiAppProvider, pixiApp} from './context';
+import store from './store';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
 
-app.ports.createSocket.subscribe(() => {
-    const socket = io('http://localhost:8082');
+ReactDOM.render(
+  <PixiAppProvider value={pixiApp}>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </PixiAppProvider>,
+  document.getElementById('root')
+);
 
-    socket.on('game_created', (game) => {
-        console.log('Game received', game);
-        app.ports.gameCreated.send(game);
-    });
-});
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();

@@ -4,6 +4,6 @@ const {
 } = require('./Consts.js');
 
 module.exports = {
+  COLOURS_COUNT,
   COLOURS,
-  COLOURS_COUNT
 };

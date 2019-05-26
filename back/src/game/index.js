@@ -1,7 +1,3 @@
-require('../../register-models');
+const Game = require('./model');
 
-const GameContext = require('./context');
-
-
-
-module.exports = GameContext;
+module.exports = Game;
