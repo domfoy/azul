@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -5,7 +7,7 @@ import {connect} from 'react-redux';
 import {PixiAppContext} from './context';
 import './App.css';
 
-import CurrentPlayerBoard from './board';
+import PlayerBoard from './board';
 
 class App extends Component {
   componentWillUnmount() {
@@ -24,19 +26,31 @@ class App extends Component {
 
   render() {
     const app = this.context;
-    const {startPlayerId, players} = this.props;
+    const {startPlayerId, players, playerId} = this.props;
     const isRenderReady = !!startPlayerId && players.length > 0;
 
+    if (!isRenderReady) {
+      return null;
+    }
+
+    const currentPlayer = _.find(players, {id: playerId});
+    const opponents = _.filter(players, player => player.id !== playerId);
     return (
       <div className="App" ref={this.initGameCanvas}>
-        {isRenderReady && (
-          <CurrentPlayerBoard
-            x={(app.screen.width - 400) / 2}
-            y={app.screen.height - 400}
-            width={400}
-            height={300}
+        <PlayerBoard
+          xCenter={(app.screen.width) / 2}
+          yCenter={app.screen.height - 200}
+          player={currentPlayer}
+        />
+
+        {_.map(opponents, opponent => (
+          <PlayerBoard
+            key={opponent.id}
+            xCenter={(app.screen.width) / 2}
+            yCenter={app.screen.height - 200}
+            player={opponent}
           />
-        )}
+        ))}
       </div>
     );
   }
@@ -44,18 +58,18 @@ class App extends Component {
 
 App.propTypes = {
   startPlayerId: PropTypes.number,
+  playerId: PropTypes.number,
   players: PropTypes.array,
 };
 
 App.defaultProps = {
   startPlayerId: undefined,
+  playerId: undefined,
   players: []
 };
 
 App.contextType = PixiAppContext;
 
-const mapStateToProps = ({game: {startPlayerId, players}}) => {
-  return {players, startPlayerId};
-};
+const mapStateToProps = ({game: {startPlayerId, players, playerId}}) => ({players, startPlayerId, playerId});
 
 export default connect(mapStateToProps)(App);

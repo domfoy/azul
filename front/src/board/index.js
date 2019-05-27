@@ -1,3 +1,3 @@
-import CurrentPlayerBoard from './current-player';
+import PlayerBoard from './generic';
 
-export default CurrentPlayerBoard;
+export default PlayerBoard;

@@ -4,7 +4,7 @@ import * as Pixi from 'pixi.js';
 
 import {withPixiApp} from '../context';
 
-class PatternSlot extends Component {
+class Slot extends Component {
   constructor(props) {
     super(props);
 
@@ -25,7 +25,7 @@ class PatternSlot extends Component {
   }
 }
 
-PatternSlot.propTypes = {
+Slot.propTypes = {
   app: PropTypes.object.isRequired,
   height: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
@@ -33,4 +33,4 @@ PatternSlot.propTypes = {
   y: PropTypes.number.isRequired
 };
 
-export default withPixiApp(PatternSlot);
+export default withPixiApp(Slot);

@@ -2,36 +2,11 @@ import _ from 'lodash';
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import * as Pixi from 'pixi.js';
 
 import {withPixiApp} from '../context';
 import Slot from './slot';
-
-class ContentBox {
-  constructor({x, y, width, height, padding = 20}) {
-    Object.assign(this, {
-      x: x + padding,
-      y: y + padding,
-      width: width - (2 * padding),
-      height: height - (2 * padding),
-      padding
-    });
-  }
-}
-
-const patternSlots = [1, 2, 3, 4, 5].map((line) => {
-  const slots = [];
-
-  for (let col = 1; col <= line; col++) {
-    slots.push({
-      col,
-      line
-    });
-  }
-
-  return slots;
-});
+import PatternLines from './pattern-lines';
 
 const wallSlots = [1, 2, 3, 4, 5].map((line) => {
   const slots = [];
@@ -46,63 +21,78 @@ const wallSlots = [1, 2, 3, 4, 5].map((line) => {
   return slots;
 });
 
-function specificPlayerBoard(mapStateToProps) {
-  class PlayerBoard extends Component {
-    constructor(props) {
-      super(props);
+class PlayerBoard extends Component {
+  constructor(props) {
+    super(props);
 
-      const {app, x, y, width, height} = props;
-      this.contentBox = new ContentBox({x: x + 5, y: y + 5, width: width - 10, height: height - 10});
+    const {app, xCenter, yCenter} = props;
 
-      const board = new Pixi.Graphics();
-      board.beginFill(0x005500);
-      board.drawRoundedRect(x, y, width, height, 10);
-      board.beginFill(0x001100);
-      board.drawRoundedRect(x + 5, y + 5, width - 10, height - 10, 10);
-      board.endFill();
+    const padding = {
+      small: 4,
+      medium: 4,
+      large: 8
+    };
+    const c = 50;
+    const W = (14 * padding.small) + (10 * c) + (padding.large);
+    const H = (10 * padding.small) + (6 * c) + padding.large;
 
-      app.stage.addChild(board);
-    }
+    const left = xCenter - (W / 2);
+    const up = yCenter - (H / 2);
 
+    Object.assign(this, {
+      c, W, H, left, up, padding
+    });
 
-    render() {
-      const patternWidth = this.contentBox.width / 2 - 10;
-      const patternHeight = this.contentBox.height - 10;
+    const board = new Pixi.Graphics();
+    board.beginFill(0x005500);
+    board.drawRoundedRect(left - 5, up - 5, W + 10, H + 10, 10);
+    board.beginFill(0x001100);
+    board.drawRoundedRect(left, up, W, H, 10);
+    board.endFill();
 
-      return (
-        <div>
-          {_.map(patternSlots, (slotLine, line) => _.map(slotLine, (slot, col) => (
-            <Slot
-              key={col + (line * 5)}
-              x={this.contentBox.x + 5 + patternWidth - ((patternWidth / 5) * (col + 1))}
-              y={this.contentBox.y + 5 + (patternHeight / 5) * (line)}
-              width={patternWidth / 5}
-              height={patternHeight / 5}
-            />
-          )))}
-          {_.map(wallSlots, (slotLine, line) => _.map(slotLine, (slot, col) => (
-            <Slot
-              key={col + (line * 5)}
-              x={this.contentBox.x + this.contentBox.width / 2 + 5 + (patternWidth / 5) * (col)}
-              y={this.contentBox.y + 5 + (patternHeight / 5) * (line)}
-              width={patternWidth / 5}
-              height={patternHeight / 5}
-            />
-          )))}
-        </div>
-      );
-    }
+    app.stage.addChild(board);
   }
 
-  PlayerBoard.propTypes = {
-    app: PropTypes.object.isRequired,
-    height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired
-  };
 
-  return connect(mapStateToProps)(withPixiApp(PlayerBoard));
+  render() {
+    const {player} = this.props;
+    const {c, H, left, up, padding} = this;
+    const patternSide = (6 * padding.small) + (5 * c);
+
+    return (
+      <div>
+        <PatternLines
+          measures={{c, H, left, up, padding}}
+          patternLines={player.patternLines}
+        />
+        {_.map(wallSlots, (slotLine, line) => _.map(slotLine, (slot, col) => (
+          <Slot
+            key={col + (line * 5)}
+            x={left + padding.small + patternSide + padding.large + (padding.small + c) * (col)}
+            y={up + padding.small + (padding.small + c) * (line)}
+            width={c}
+            height={c}
+          />
+        )))}
+        {_.map([0, 1, 2, 3, 4, 5, 6], col => (
+          <Slot
+            key={col}
+            x={left + padding.small + (padding.small + c) * col}
+            y={up + H - (2 * padding.small) - c}
+            width={c}
+            height={c}
+          />
+        ))}
+      </div>
+    );
+  }
 }
 
-export default specificPlayerBoard;
+PlayerBoard.propTypes = {
+  app: PropTypes.object.isRequired,
+  player: PropTypes.object.isRequired,
+  xCenter: PropTypes.number.isRequired,
+  yCenter: PropTypes.number.isRequired
+};
+
+export default withPixiApp(PlayerBoard);
