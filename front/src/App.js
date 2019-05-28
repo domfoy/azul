@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import {PixiAppContext} from './context';
 import './App.css';
 
+import FactorySet from './factory';
 import PlayerBoard from './board';
 
 class App extends Component {
@@ -26,7 +27,7 @@ class App extends Component {
 
   render() {
     const app = this.context;
-    const {startPlayerId, players, playerId} = this.props;
+    const {startPlayerId, players, playerId, factories} = this.props;
     const isRenderReady = !!startPlayerId && players.length > 0;
 
     if (!isRenderReady) {
@@ -51,18 +52,26 @@ class App extends Component {
             player={opponent}
           />
         ))}
+
+        <FactorySet
+          factories={factories}
+          xCenter={app.screen.width / 2}
+          yCenter={app.screen.height / 2}
+        />
       </div>
     );
   }
 }
 
 App.propTypes = {
+  factories: PropTypes.array,
   startPlayerId: PropTypes.number,
   playerId: PropTypes.number,
   players: PropTypes.array,
 };
 
 App.defaultProps = {
+  factories: [],
   startPlayerId: undefined,
   playerId: undefined,
   players: []
@@ -70,6 +79,6 @@ App.defaultProps = {
 
 App.contextType = PixiAppContext;
 
-const mapStateToProps = ({game: {startPlayerId, players, playerId}}) => ({players, startPlayerId, playerId});
+const mapStateToProps = ({game: {startPlayerId, players, playerId, factories}}) => ({players, startPlayerId, playerId, factories});
 
 export default connect(mapStateToProps)(App);

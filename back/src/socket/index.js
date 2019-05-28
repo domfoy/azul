@@ -1,8 +1,29 @@
 const _ = require('lodash');
 
-const GameContext = require('../game');
+const Game = require('../game');
 const setupBots = require('../ia');
 
+const {
+  COLOURS
+} = require('../../models');
+
+function getTileColour(tileId) {
+  if (tileId === 0) {
+    return '1st';
+  }
+
+  return COLOURS[Math.floor((tileId - 1) / 20)];
+}
+
+function formatFactories(factories) {
+  return _.map(factories, factory => ({
+    id: factory.id,
+    tiles: _.map(factory.tiles, tile => ({
+      id: tile,
+      colour: getTileColour(tile)
+    }))
+  }));
+}
 
 function sendToRoom(room, action, userSpecificSender) {
   for (const user of room.users) {
@@ -102,7 +123,7 @@ async function handleClientAction(state, socket, rawMessage) {
 
     if (room.userCount === room.users.length) {
       const bots = setupBots({randomCount: room.botCount});
-      const game = await new GameContext(room.users, bots);
+      const game = await new Game(room.users, bots);
 
       room.game = game;
 
@@ -111,7 +132,8 @@ async function handleClientAction(state, socket, rawMessage) {
         payload: {
           name: room.name,
           players: _.map(room.game.players, player => _.pick(player, ['name', 'id'])),
-          startPlayerId: 1
+          startPlayerId: 1,
+          factories: formatFactories(room.game.factories)
         }
       }, (currentUser) => {
         const currentPlayer = _.find(room.game.players, {user: currentUser});

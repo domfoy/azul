@@ -2,7 +2,7 @@ import {Component} from 'react';
 import PropTypes from 'prop-types';
 import * as Pixi from 'pixi.js';
 
-import {withPixiApp} from '../context';
+import {withPixiApp} from './context';
 
 class Slot extends Component {
   constructor(props) {

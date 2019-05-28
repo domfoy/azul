@@ -18,6 +18,7 @@ function parseServerAction(state, action) {
         playerId,
         players,
         startPlayerId,
+        factories,
       } = action.payload;
 
       return gameActions.start({
@@ -25,6 +26,7 @@ function parseServerAction(state, action) {
         playerId,
         players,
         startPlayerId,
+        factories
       });
     }
     default:

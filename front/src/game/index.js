@@ -19,6 +19,7 @@ export const reducer = handleActions(
         playerId,
         players,
         startPlayerId,
+        factories
       } = payload;
       return {
         ...state,
@@ -35,7 +36,11 @@ export const reducer = handleActions(
         turn: {
           id: 1,
           playerId: startPlayerId
-        }
+        },
+        factories: _.map(factories, factory => ({
+          id: factory.id,
+          tiles: _.map(factory.tiles, tile => ({id: tile.id, colour: tile.colour}))
+        }))
       };
     },
   },

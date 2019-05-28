@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import * as Pixi from 'pixi.js';
 
 import {withPixiApp} from '../context';
-import Slot from './slot';
+import Slot from '../slot';
 import PatternLines from './pattern-lines';
 
 const wallSlots = [1, 2, 3, 4, 5].map((line) => {
@@ -32,7 +32,7 @@ class PlayerBoard extends Component {
       medium: 4,
       large: 8
     };
-    const c = 50;
+    const c = 32;
     const W = (14 * padding.small) + (10 * c) + (padding.large);
     const H = (10 * padding.small) + (6 * c) + padding.large;
 

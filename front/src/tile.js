@@ -9,7 +9,28 @@ class Tile extends Component {
     super(props);
 
     const {app, x, y, width, height, colour} = props;
-    const colourCode = colour ? 0x005500 : 0x550000;
+
+    let colourCode;
+    switch (colour) {
+      case 'Bu':
+        colourCode = 0x001166;
+        break;
+      case 'Ba':
+        colourCode = 0x11111;
+        break;
+      case 'W':
+        colourCode = 0x888888;
+        break;
+      case 'R':
+        colourCode = 0x661100;
+        break;
+      case 'Y':
+        colourCode = 0x666611;
+        break;
+      default:
+        colourCode = 0x222222;
+        break;
+    }
 
     const board = new Pixi.Graphics();
     board.beginFill(colourCode);

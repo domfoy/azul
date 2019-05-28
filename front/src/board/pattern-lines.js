@@ -3,7 +3,7 @@ import _ from 'lodash';
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import Slot from './slot';
+import Slot from '../slot';
 import Tile from '../tile';
 
 const patternSlots = [1, 2, 3, 4, 5].map((line) => {
@@ -50,10 +50,10 @@ class PatternLines extends Component {
 
   render() {
     const {patternLines, measures} = this.props;
-    const {c, left, up, padding, patternSide} = measures;
+    const {c, left, up, padding} = measures;
+    const patternSide = (6 * padding.small) + (5 * c);
     const {renderTiles} = this;
 
-    console.log(patternSlots);
     return (
       <div>
         {_.map(patternSlots, (slotLine, line) => _.map(slotLine, (slot, col) => (

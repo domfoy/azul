@@ -26,6 +26,10 @@ module.exports = {
   applyAction
 };
 
+function getColourFromIndex(index) {
+  return COLOURS[Math.floor((index - 1) / 20)];
+}
+
 function isOver(game) {
   return _.some(game.players, (player) => {
     return _.some(_.values(_.groupBy(player.wall, 'line')), line => line.length === 5);
@@ -126,7 +130,7 @@ function addTileToPenaltyLine(player, tile) {
 }
 
 function putTilesIntoBag(game, tiles) {
-  _.each(tiles, tile => game.bag.push(tile.index));
+  _.each(tiles, tile => game.bag.push(tile));
 
   game.bag = _.sort(game.bag);
 }
