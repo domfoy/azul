@@ -19,7 +19,7 @@ class FactorySet extends Component {
       return (
         <Factory
           key={factory.id}
-          xCenter={x + (radius * Math.cos(fullRadian * (factory.id - 1) / factoryCount + shift))}
+          xCenter={x + (radius * 2 * Math.cos(fullRadian * (factory.id - 1) / factoryCount + shift))}
           yCenter={y + (radius * Math.sin(fullRadian * (factory.id - 1) / factoryCount + shift))}
           bucket={factory.tiles}
         />
