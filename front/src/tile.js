@@ -8,7 +8,7 @@ class Tile extends Component {
   constructor(props) {
     super(props);
 
-    const {app, x, y, width, height, colour} = props;
+    const {app, x, y, width, height, colour, onClicked} = props;
 
     let colourCode;
     switch (colour) {
@@ -32,12 +32,18 @@ class Tile extends Component {
         break;
     }
 
-    const board = new Pixi.Graphics();
-    board.beginFill(colourCode);
-    board.drawRoundedRect(x, y, width, height, 5);
-    board.endFill();
+    const tileGraphic = new Pixi.Graphics();
+    tileGraphic.beginFill(colourCode);
+    tileGraphic.drawRoundedRect(x, y, width, height, 5);
+    tileGraphic.endFill();
 
-    app.stage.addChild(board);
+    tileGraphic.interactive = true;
+    tileGraphic.on('click', () => {
+      console.log('clicked');
+      return onClicked();
+    });
+
+    app.stage.addChild(tileGraphic);
   }
 
   render() {
@@ -47,11 +53,16 @@ class Tile extends Component {
 
 Tile.propTypes = {
   app: PropTypes.object.isRequired,
+  onClicked: PropTypes.func,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
   colour: PropTypes.string.isRequired
+};
+
+Tile.defaultProps = {
+  onClicked: () => {},
 };
 
 export default withPixiApp(Tile);

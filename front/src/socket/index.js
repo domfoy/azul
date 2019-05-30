@@ -42,6 +42,7 @@ export default (url = 'ws://localhost:8082/ws') => (storeApi) => {
   };
 
   return next => (action) => {
+    console.log(action);
     if (_.get(action, 'meta.isSocket') && _.get(action, 'meta.direction') === 'OUT') {
       const state = storeApi.getState();
 
