@@ -50,23 +50,28 @@ class PlayerBoard extends Component {
     board.drawRoundedRect(left, up, W, H, 10);
     board.endFill();
 
+    board.sortableChildren = true;
+
     app.stage.addChild(board);
+    this.board = board;
   }
 
 
   render() {
     const {player} = this.props;
-    const {c, H, left, up, padding} = this;
+    const {c, H, left, up, padding, board} = this;
     const patternSide = (6 * padding.small) + (5 * c);
 
     return (
       <div>
         <PatternLines
+          parent={board}
           measures={{c, H, left, up, padding}}
           patternLines={player.patternLines}
         />
         {_.map(wallSlots, (slotLine, line) => _.map(slotLine, (slot, col) => (
           <Slot
+            parent={board}
             key={col + (line * 5)}
             x={left + padding.small + patternSide + padding.large + (padding.small + c) * (col)}
             y={up + padding.small + (padding.small + c) * (line)}
@@ -76,6 +81,7 @@ class PlayerBoard extends Component {
         )))}
         {_.map([0, 1, 2, 3, 4, 5, 6], col => (
           <Slot
+            parent={board}
             key={col}
             x={left + padding.small + (padding.small + c) * col}
             y={up + H - (2 * padding.small) - c}

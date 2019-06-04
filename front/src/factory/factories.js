@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 
 import Factory from './factory';
 
@@ -26,7 +27,7 @@ class FactorySet extends Component {
       );
     });
 
-    return factoryComponents;
+    return (factoryComponents);
   }
 }
 
@@ -36,4 +37,6 @@ FactorySet.propTypes = {
   yCenter: PropTypes.number.isRequired
 };
 
-export default FactorySet;
+const mapStateToProps = ({game: {factories}}) => ({factories});
+
+export default connect(mapStateToProps)(FactorySet);

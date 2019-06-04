@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 
 import {createStore, applyMiddleware, compose} from 'redux';
-import logger from 'redux-logger'
+import logger from 'redux-logger';
 import createSocketMiddleware from '../socket';
 import reducers from './reducers';
 

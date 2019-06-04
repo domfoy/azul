@@ -8,7 +8,7 @@ import {withPixiApp} from '../context';
 import FactorySet from '../factory';
 import PlayerBoard from '../board';
 
-function Game({app, players, playerId, factories}) {
+function Game({app, players, playerId}) {
   const currentPlayer = _.find(players, {id: playerId});
   const opponents = _.filter(players, player => player.id !== playerId);
   return (
@@ -29,7 +29,6 @@ function Game({app, players, playerId, factories}) {
       ))}
 
       <FactorySet
-        factories={factories}
         xCenter={app.screen.width / 2}
         yCenter={app.screen.height / 2}
       />
@@ -39,11 +38,10 @@ function Game({app, players, playerId, factories}) {
 
 Game.propTypes = {
   app: PropTypes.object.isRequired,
-  factories: PropTypes.array.isRequired,
   playerId: PropTypes.number.isRequired,
   players: PropTypes.array.isRequired,
 };
 
-const mapStateToProps = ({game: {startPlayerId, players, playerId, factories}}) => ({players, startPlayerId, playerId, factories});
+const mapStateToProps = ({game: {startPlayerId, players, playerId}}) => ({players, startPlayerId, playerId});
 
 export default connect(mapStateToProps)(withPixiApp(Game));

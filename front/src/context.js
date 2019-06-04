@@ -6,10 +6,14 @@ import {
   MIN_WIDTH
 } from './constants';
 
-export const pixiApp = new Pixi.Application({
+const pixiApp = new Pixi.Application({
   width: window.innerWidth < MIN_WIDTH ? MIN_WIDTH : window.innerWidth,
   height: window.innerHeight < MIN_HEIGHT ? MIN_HEIGHT : window.innerHeight
 });
+
+pixiApp.stage.sortableChildren = true;
+
+export {pixiApp};
 
 export const PixiAppContext = React.createContext(null);
 

@@ -43,7 +43,15 @@ class Tile extends Component {
       return onClicked();
     });
 
+    this.graphic = tileGraphic;
     app.stage.addChild(tileGraphic);
+  }
+
+  componentWillUnmount() {
+    const {app} = this.props;
+
+    console.log('about to be deleted');
+    app.stage.removeChild(this.graphic);
   }
 
   render() {
