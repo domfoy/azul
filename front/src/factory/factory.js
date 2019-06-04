@@ -15,7 +15,7 @@ class Factory extends Component {
     const tiles = _.map(factory.tiles, (tile, index) => (
       <Tile
         key={tile.id}
-        onClicked={() => pickTile({factory, tile})}
+        onClicked={() => pickTile({factory, colour: tile.colour})}
         x={index % 2 === 0 ? xCenter - padding - c : xCenter + padding}
         y={index <= 1 ? yCenter - padding - c : yCenter + padding}
         width={c}
@@ -36,7 +36,7 @@ Factory.propTypes = {
 };
 
 const mapDispatchToProps = dispatch => ({
-  pickTile: ({factory, tile}) => dispatch(actions.pickTile({factory, tile}))
+  pickTile: ({factory, colour}) => dispatch(actions.pickTile({factory, colour}))
 });
 
 export default connect(null, mapDispatchToProps)(Factory);

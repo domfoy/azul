@@ -25,11 +25,15 @@ const patternSlots = [1, 2, 3, 4, 5].map((line) => {
 class PatternLines extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+
+    };
 
     const {measures, parent, overPatternLine, layTile} = props;
     const {c, left, up, padding} = measures;
 
     const patternSide = (6 * padding.small) + (5 * c);
+
 
     for (let i = 0; i < 5; i++) {
       const patternLine = new Pixi.Graphics();
@@ -39,8 +43,24 @@ class PatternLines extends Component {
       patternLine.endFill();
       patternLine.zIndex = 20;
       patternLine.interactive = true;
-      patternLine.on('mouseover', () => overPatternLine({patternLineId: i + 1}));
-      patternLine.on('mouseup', () => layTile());
+      patternLine.on('mouseover', () => {
+        const {turn, patternLines} = this.props;
+
+        const targettedPatternLineId = i + 1;
+        const targettedPatternLine = _.find(patternLines, {id: targettedPatternLineId});
+        if (turn.colour && (targettedPatternLine.count === 0 || turn.colour === targettedPatternLine.colour)) {
+          overPatternLine({patternLineId: i + 1});
+        }
+      });
+      patternLine.on('mouseup', () => {
+        const {turn, patternLines} = this.props;
+
+        const targettedPatternLineId = i + 1;
+        const targettedPatternLine = _.find(patternLines, {id: targettedPatternLineId});
+        if (turn.colour && (targettedPatternLine.count === 0 || turn.colour === targettedPatternLine.colour)) {
+          layTile();
+        }
+      });
 
       parent.addChild(patternLine);
     }
@@ -99,6 +119,7 @@ class PatternLines extends Component {
 }
 
 PatternLines.propTypes = {
+  turn: PropTypes.object.isRequired,
   parent: PropTypes.object.isRequired,
   overPatternLine: PropTypes.func.isRequired,
   layTile: PropTypes.func.isRequired,
@@ -106,9 +127,11 @@ PatternLines.propTypes = {
   measures: PropTypes.object.isRequired,
 };
 
+const mapStateToProps = ({game: {turn}}) => ({turn});
+
 const mapDispatchToProps = dispatch => ({
   overPatternLine: ({patternLineId}) => dispatch(actions.overPatternLine({patternLineId})),
   layTile: () => dispatch(actions.layTile())
 });
 
-export default connect(null, mapDispatchToProps)(PatternLines);
+export default connect(mapStateToProps, mapDispatchToProps)(PatternLines);

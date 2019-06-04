@@ -7,8 +7,8 @@ const defaultState = {};
 export const actions = createActions({
   SET_NAME: name => ({name}),
   START: payload => payload,
-  PICK_TILE: ({factory, tile}) => {
-    return {factory, tile};
+  PICK_TILE: ({factory, colour}) => {
+    return {factory, colour};
   },
   OVER_PATTERN_LINE: ({patternLineId}) => {
     return {patternLineId};
@@ -27,6 +27,12 @@ export const reducer = handleActions(
         startPlayerId,
         factories
       } = payload;
+      const patternLines = _.reduce([1, 2, 3, 4, 5], (acc, cur) => {
+        acc.push({id: cur, count: 0});
+
+        return acc;
+      }, []);
+
       return {
         ...state,
         name,
@@ -36,7 +42,7 @@ export const reducer = handleActions(
           id,
           name: playerName,
           score: 0,
-          patternLines: [],
+          patternLines,
           wall: [],
           penalties: []
         })),
@@ -44,31 +50,25 @@ export const reducer = handleActions(
           id: 1,
           playerId: startPlayerId
         },
-        tableCenter: [{id: 0, colour: 'one'}],
+        tableCenter: [{colour: 'one', count: 1}],
         factories: _.map(factories, factory => ({
           id: factory.id,
           tiles: _.map(factory.tiles, tile => ({id: tile.id, colour: tile.colour}))
         }))
       };
     },
-    [actions.pickTile]: (state, {payload: {factory, tile}}) => {
-      console.log(factory, tile);
-
+    [actions.pickTile]: (state, {payload: {factory, colour}}) => {
       return {
         ...state,
         turn: {
           ...state.turn,
           factoryId: factory.id,
-          colour: tile.colour,
-          count: _.filter(factory.tiles, {colour: tile.colour}).length
+          colour,
+          count: factory.id === 0 ? _.find(state.tableCenter, {colour}).count : _.filter(factory.tiles, {colour}).length
         }
       };
     },
     [actions.overPatternLine]: (state, {payload: {patternLineId}}) => {
-      if (!state.turn.factoryId) {
-        return state;
-      }
-
       return {
         ...state,
         turn: {
@@ -83,23 +83,29 @@ export const reducer = handleActions(
       }
 
       const pickCount = state.turn.count;
-      const pickedFactory = _.find(state.factories, {id: state.turn.factoryId});
-      const otherTiles = _.reject(pickedFactory.tiles, {colour: state.turn.colour});
-      const groupedOtherTiles = _(otherTiles)
-        .groupBy('colour')
-        .map((tiles, colour) => ({colour, count: tiles.length}))
-        .value();
+      let tableCenter = state.tableCenter;
 
-      const tableCenter = _.reduce(groupedOtherTiles, (acc, cur) => {
-        const found = _.findIndex(acc, {colour: cur.colour});
-        if (found >= 0) {
-          acc.splice(found, 1, {colour: cur.colour, count: acc[found].count + cur.count});
-        } else {
-          acc.push({colour: cur.colour, count: cur.count});
-        }
+      if (state.turn.factoryId === 0) {
+        tableCenter = _.reject(state.tableCenter, {colour: state.turn.colour});
+      } else {
+        const pickedFactory = _.find(state.factories, {id: state.turn.factoryId});
+        const otherTiles = _.reject(pickedFactory.tiles, {colour: state.turn.colour});
+        const groupedOtherTiles = _(otherTiles)
+          .groupBy('colour')
+          .map((tiles, colour) => ({colour, count: tiles.length}))
+          .value();
 
-        return acc;
-      }, state.tableCenter);
+        tableCenter = _.reduce([...state.tableCenter, ...groupedOtherTiles], (acc, cur) => {
+          const found = _.find(acc, {colour: cur.colour});
+          if (found) {
+            found.count += cur.count;
+          } else {
+            acc.push({colour: cur.colour, count: cur.count});
+          }
+
+          return acc;
+        }, []);
+      }
 
       const players = _.map(state.players, (player) => {
         if (player.id !== state.playerId) {
@@ -108,7 +114,8 @@ export const reducer = handleActions(
 
         const patternLineId = state.turn.patternLineId;
         const remainingPenaltiesRoom = 8 - player.penalties.length;
-        const newPatternLine = _.find(player.patternLines, {id: patternLineId}) || {id: patternLineId, count: 0, colour: state.turn.colour};
+        const targettedPatternLine = _.find(player.patternLines, {id: patternLineId});
+        const newPatternLine = {...targettedPatternLine, colour: state.turn.colour};
         const remainingRoom = patternLineId - newPatternLine.count;
 
         if (pickCount <= remainingRoom) {
@@ -146,16 +153,6 @@ export const reducer = handleActions(
       const factories = _.map(state.factories, (factory) => {
         if (factory.id !== state.turn.factoryId) {
           return factory;
-        }
-
-        if (factory.id === 0) {
-          return {
-            ...factory,
-            tiles: [
-              ...factory.tiles,
-              ...otherTiles
-            ]
-          };
         }
 
         return {
