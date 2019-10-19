@@ -52,7 +52,7 @@ function formatFactories(factories) {
 
 function getTileColour(tileId) {
   if (tileId === 0) {
-    return '1st';
+    return '0';
   }
 
   return COLOURS[Math.floor((tileId - 1) / 20)];

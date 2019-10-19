@@ -1,6 +1,7 @@
 env:
   browser: true
   es6: true
+  jest: true
 extends: airbnb
 parser: babel-eslint
 globals:
@@ -16,10 +17,11 @@ plugins:
 rules: {
     "comma-dangle": ["error", "only-multiline"],
     "max-len": 0,
+    "no-use-before-define": 0,
     "no-plusplus": ["error", {"allowForLoopAfterthoughts": true}],
     "no-restricted-syntax": 0,
     "object-curly-newline": 0,
-    "object-curly-spacing": ["error", "never"],
+    "object-curly-spacing": 0,
     "prefer-destructuring": 0,
     "react/forbid-prop-types": 0,
     "react/jsx-filename-extension": [1, {"extensions": [".js", ".jsx"]}],

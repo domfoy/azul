@@ -1,0 +1,16 @@
+name: New Game
+playerId: 1
+players:
+-
+  name: Player 1
+  id: 1
+-
+  name: Player 2
+  id: 2
+factories:
+- Bu Bu Ba Ba  
+- Y Bu Ba Y 
+- R Bu R Ba  
+- Ba R Y W  
+- W R W W
+  

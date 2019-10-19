@@ -7,18 +7,14 @@ const defaultState = {};
 export const actions = createActions({
   SET_NAME: name => ({name}),
   START: payload => payload,
-  PICK_TILE: ({factory, colour}) => {
-    return {factory, colour};
-  },
-  OVER_PATTERN_LINE: ({patternLineId}) => {
-    return {patternLineId};
-  },
+  PICK_TILE: ({factory, colour}) => ({factory, colour}),
+  OVER_PATTERN_LINE: ({patternLineId}) => ({patternLineId}),
   LAY_TILE: () => {}
 });
 
 export const reducer = handleActions(
   {
-    [actions.setName]: (state, {name}) => ({...state, player: {name}}),
+    [actions.setName]: (state, {payload: {name}}) => ({...state, player: {name}}),
     [actions.start]: (state, {payload}) => {
       const {
         name,
@@ -57,26 +53,22 @@ export const reducer = handleActions(
         }))
       };
     },
-    [actions.pickTile]: (state, {payload: {factory, colour}}) => {
-      return {
-        ...state,
-        turn: {
-          ...state.turn,
-          factoryId: factory.id,
-          colour,
-          count: factory.id === 0 ? _.find(state.tableCenter, {colour}).count : _.filter(factory.tiles, {colour}).length
-        }
-      };
-    },
-    [actions.overPatternLine]: (state, {payload: {patternLineId}}) => {
-      return {
-        ...state,
-        turn: {
-          ...state.turn,
-          patternLineId
-        }
-      };
-    },
+    [actions.pickTile]: (state, {payload: {factory, colour}}) => ({
+      ...state,
+      turn: {
+        ...state.turn,
+        factoryId: factory.id,
+        colour,
+        count: factory.id === 0 ? _.find(state.tableCenter, {colour}).count : _.filter(factory.tiles, {colour}).length
+      }
+    }),
+    [actions.overPatternLine]: (state, {payload: {patternLineId}}) => ({
+      ...state,
+      turn: {
+        ...state.turn,
+        patternLineId
+      }
+    }),
     [actions.layTile]: (state) => {
       if (!state.turn.patternLineId) {
         return state;
