@@ -1,6 +1,12 @@
-import readYaml, {initialPatternLines} from './parser';
+import defaultGame from './default';
+import initialPatternLines from './initial-pattern-lines';
+import readYaml from './parser';
 
-const d = readYaml(`${__dirname}/default.yaml`);
-export default d;
+const layTileMoves = readYaml(`${__dirname}/picks/test-1.yaml`, {kind: 'layTileMoves'});
 
-export {initialPatternLines};
+export default defaultGame;
+
+export {
+  initialPatternLines,
+  layTileMoves
+};

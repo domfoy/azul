@@ -1,0 +1,46 @@
+initial:
+  player: {}
+  factories: |
+    Bu Bu Ba Ba
+    Y Bu Ba Y
+    R Bu R Ba
+    Ba R Y W
+    W W W W
+  tableCenter: '0'
+
+moves:
+  -
+    factoryId: 1
+    colour: Bu
+    patternLineId: 2
+    expected: 
+      player: |
+        \n
+        Bu Bu
+      factories: |
+        \n
+        Y Bu Ba Y
+        R Bu R Ba
+        Ba R Y W
+        W W W W
+      tableCenter: 0 Ba Ba
+  -
+    factoryId: 5
+    colour: W
+    patternLineId: 4
+    expected: 
+      player: |
+        \n
+        \n
+        \n
+        W W W W
+      factories: |
+        Bu Bu Ba Ba
+        Y Bu Ba Y
+        R Bu R Ba
+        Ba R Y W
+        
+      tableCenter: '0'
+
+
+  

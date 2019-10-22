@@ -7,10 +7,10 @@ players:
 -
   name: Player 2
   id: 2
-factories:
-- Bu Bu Ba Ba  
-- Y Bu Ba Y 
-- R Bu R Ba  
-- Ba R Y W  
-- W R W W
+factories: |
+  Bu Bu Ba Ba  
+  Y Bu Ba Y 
+  R Bu R Ba  
+  Ba R Y W  
+  W R W W
   
