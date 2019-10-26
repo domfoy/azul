@@ -1,11 +1,11 @@
+import _ from 'lodash';
+
 import {actions} from '../../index';
 import {layTileMoves} from '../data';
 
-export default [
-  {
-    name: 'should lay tile',
-    initialState: layTileMoves[0].initialState,
-    actionPayload: actions.layTile(),
-    expectedState: layTileMoves[0].expectedState
-  }
-];
+export default _.map(layTileMoves, (move, index) => ({
+  name: `should lay tile (iteration ${index + 1})`,
+  initialState: move.initialState,
+  actionPayload: actions.layTile(),
+  expectedState: move.expectedState
+}));
