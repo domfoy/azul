@@ -41,6 +41,24 @@ moves:
         Ba R Y W
         
       tableCenter: '0'
+  -
+    factoryId: 2
+    colour: Y
+    patternLineId: 5
+    expected: 
+      player: |
+        
+        
+        
+
+        Y Y
+      factories: |
+        Bu Bu Ba Ba
+
+        R Bu R Ba
+        Ba R Y W
+        W W W W
+      tableCenter: 0 Bu Ba
 
 
   
