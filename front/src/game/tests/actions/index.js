@@ -4,8 +4,8 @@ import pickTile from './pick-tile';
 import layTile from './lay-tile';
 
 export default [
-  // setName,
-  // startGame,
-  // pickTile,
+  setName,
+  startGame,
+  pickTile,
   ...layTile
 ];
