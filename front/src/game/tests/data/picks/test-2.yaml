@@ -1,0 +1,29 @@
+initial:
+  player: {}
+  factories: |
+    Bu Bu Ba Ba
+
+    R Bu R Ba
+    Ba R Y W
+    W W W W
+  tableCenter: Bu Ba,2
+
+moves:
+  -
+    title: 2 tiles from table center to penalties
+    factoryId: 0
+    colour: 'Ba'
+    patternLineId: null
+    expected: 
+      patternLines: ''
+      penalties: Ba,2
+      factories: |
+        Bu Bu Ba Ba
+
+        R Bu R Ba
+        Ba R Y W
+        W W W W
+      tableCenter: Bu
+
+
+  

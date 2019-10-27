@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 export default (state) => {
-  if (!state.turn.patternLineId) {
+  if (state.turn.factoryId !== 0 && !state.turn.patternLineId) {
     return state;
   }
 
@@ -20,32 +20,33 @@ export default (state) => {
 };
 
 function updateTableCenter(state) {
-  let tableCenter = state.tableCenter;
-
   if (state.turn.factoryId === 0) {
-    tableCenter = _.reject(state.tableCenter, {colour: state.turn.colour});
-  } else {
-    const pickedFactory = _.find(state.factories, {id: state.turn.factoryId});
-    const otherTiles = _.reject(pickedFactory.tiles, {colour: state.turn.colour});
+    const tableCenterWithoutPenaltyToken = _.find(state.tableCenter, {colour: '0'})
+      ? _.reject(state.tableCenter, {colour: '0'})
+      : state.tableCenter;
 
-    const groupedOtherTiles = _(otherTiles)
-      .groupBy('colour')
-      .map((tiles, colour) => ({colour, count: tiles.length}))
-      .value();
-
-    tableCenter = _.reduce([...state.tableCenter, ...groupedOtherTiles], (acc, cur) => {
-      const found = _.find(acc, {colour: cur.colour});
-      if (found) {
-        found.count += cur.count;
-      } else {
-        acc.push({colour: cur.colour, count: cur.count});
-      }
-
-      return acc;
-    }, []);
+    return _.reject(tableCenterWithoutPenaltyToken, {colour: state.turn.colour});
   }
 
-  return tableCenter;
+  const pickedFactory = _.find(state.factories, {id: state.turn.factoryId});
+  const otherTiles = _.reject(pickedFactory.tiles, {colour: state.turn.colour});
+
+  const groupedOtherTiles = _(otherTiles)
+    .groupBy('colour')
+    .map((tiles, colour) => ({colour, count: tiles.length}))
+    .value();
+
+  // TODO change reduce into groupBy
+  return _.reduce([...state.tableCenter, ...groupedOtherTiles], (acc, cur) => {
+    const found = _.find(acc, {colour: cur.colour});
+    if (found) {
+      found.count += cur.count;
+    } else {
+      acc.push({colour: cur.colour, count: cur.count});
+    }
+
+    return acc;
+  }, []);
 }
 
 function updatePlayers(state) {
@@ -56,14 +57,57 @@ function updatePlayers(state) {
 }
 
 function updatePlayer(state, player) {
-  const pickCount = state.turn.count;
-
   if (player.id !== state.playerId) {
     return player;
   }
 
-  const remainingPenaltiesRoom = 8 - player.penalties.length;
   const patternLineId = state.turn.patternLineId;
+
+  if (patternLineId === null) {
+    // from table center or factory to penalties
+    return updatePlayerOnPenaltiesTargetted(state, player);
+  }
+
+  // from table center or factory to pattern line
+  return updatePlayerOnPatternLineTargetted(state, player);
+}
+
+function updatePlayerOnPenaltiesTargetted(state, player) {
+  let newPenalties = player.penalties;
+  if (_.find(state.tableCenter, {colour: '0'})) {
+    newPenalties = [
+      ...player.penalties,
+      {colour: '0', count: 1}
+    ];
+  }
+
+  const pickCount = state.turn.count;
+  const remainingPenaltiesRoom = 8 - player.penalties.length;
+  if (pickCount === 0 || remainingPenaltiesRoom === 0) {
+    return {
+      ...player,
+      penalties: newPenalties
+    };
+  }
+
+  return {
+    ...player,
+    penalties: [
+      ...newPenalties,
+      {
+        count: pickCount,
+        colour: pickCount <= remainingPenaltiesRoom
+          ? state.turn.colour
+          : remainingPenaltiesRoom
+      }
+    ]
+  };
+}
+
+function updatePlayerOnPatternLineTargetted(state, player) {
+  const pickCount = state.turn.count;
+  const patternLineId = state.turn.patternLineId;
+
   const targettedPatternLine = _.find(player.patternLines, {id: patternLineId});
   const newPatternLine = {...targettedPatternLine, colour: state.turn.colour};
   const remainingRoom = patternLineId - newPatternLine.count;
@@ -72,6 +116,8 @@ function updatePlayer(state, player) {
     newPatternLine.count += pickCount;
   } else {
     newPatternLine.count = patternLineId;
+
+    const remainingPenaltiesRoom = 8 - player.penalties.length;
 
     const toPenalty = pickCount - remainingRoom;
     const reallyToPenalty = toPenalty <= remainingPenaltiesRoom

@@ -10,11 +10,27 @@ initial:
 
 moves:
   -
+    title: penalty token from table center to penalties
+    factoryId: 0
+    colour: '0'
+    patternLineId: null
+    expected: 
+      patternLines: ''
+      penalties: '0'
+      factories: |
+        Bu Bu Ba Ba
+        Y Bu Ba Y
+        R Bu R Ba
+        Ba R Y W
+        W W W W
+      tableCenter: ''
+  -
+    title: from 1st factory to 2nd pattern line
     factoryId: 1
     colour: Bu
     patternLineId: 2
     expected: 
-      player: |
+      patternLines: |
         
         Bu Bu
       factories: |
@@ -25,11 +41,12 @@ moves:
         W W W W
       tableCenter: 0 Ba,2
   -
+    title: all tokens from 5th factory to 4th pattern line 
     factoryId: 5
     colour: W
     patternLineId: 4
     expected: 
-      player: |
+      patternLines: |
         
         
         
@@ -42,11 +59,12 @@ moves:
         
       tableCenter: '0'
   -
+    title: 2 token from 2nd factory to 5th pattern line
     factoryId: 2
     colour: Y
     patternLineId: 5
     expected: 
-      player: |
+      patternLines: |
         
         
         

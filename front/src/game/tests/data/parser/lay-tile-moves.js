@@ -2,8 +2,9 @@ import _ from 'lodash';
 
 import {
   parseFactories,
-  parseTableCenter,
-  parsePatternLines
+  parsePatternLines,
+  parsePenalties,
+  parseTableCenter
 } from './lib';
 
 import defaultGame from '../default';
@@ -29,7 +30,10 @@ function parseLayTileMove({initialState}, layTileMove) {
     {},
     initialState,
     {
-      turn: parseTurn(initialState.factories, layTileMove)
+      turn: parseTurn({
+        factories: initialState.factories,
+        tableCenter: initialState.tableCenter,
+      }, layTileMove)
     }
   );
 
@@ -48,23 +52,33 @@ function parseLayTileMove({initialState}, layTileMove) {
   );
 
   return {
+    title: layTileMove.title,
     initialState: augmentedInitialState,
     expectedState
   };
 }
 
-function parseTurn(factories, move) {
+function parseTurn({factories, tableCenter}, move) {
+  let count = 0;
+  if (move.colour === '0') {
+    count = 0;
+  } else if (move.factoryId === 0) {
+    count = _.find(tableCenter, {colour: move.colour}).count;
+  } else {
+    count = _.filter(_.find(factories, {id: move.factoryId}).tiles, {colour: move.colour}).length;
+  }
+
   return {
     id: 1,
     playerId: 1,
     patternLineId: move.patternLineId,
     factoryId: move.factoryId,
     colour: move.colour,
-    count: _.filter(_.find(factories, {id: move.factoryId}).tiles, {colour: move.colour}).length
+    count
   };
 }
 
-function mergeStateWithExpectations(state, {patternLines, factories, tableCenter}) {
+function mergeStateWithExpectations(state, {patternLines, penalties, factories, tableCenter}) {
   return {
     ...state,
     factories,
@@ -73,7 +87,8 @@ function mergeStateWithExpectations(state, {patternLines, factories, tableCenter
       {
         ...state.players[0],
         id: 1,
-        patternLines
+        patternLines,
+        penalties
       },
       state.players[1]
     ]
@@ -82,8 +97,9 @@ function mergeStateWithExpectations(state, {patternLines, factories, tableCenter
 
 function parseLayTileMoveExpectation(move) {
   return {
-    patternLines: parsePatternLines(move.expected.player),
     factories: parseFactories(move.expected.factories),
+    patternLines: parsePatternLines(move.expected.patternLines),
+    penalties: parsePenalties(move.expected.penalties),
     tableCenter: parseTableCenter(move.expected.tableCenter)
   };
 }

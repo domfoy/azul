@@ -106,6 +106,10 @@ function parsePatternLine(line, id) {
   };
 }
 
+export function parsePenalties(penalties) {
+  return parseTableCenter(penalties);
+}
+
 function parseBlockOfLines(block) {
   const parsedBlock = _.split(block, '\n');
   const lines = _.slice(parsedBlock, 0, parsedBlock.length - 1);
