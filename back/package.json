@@ -31,7 +31,7 @@
     "koa-mongoose": "^2.0.0",
     "koa-router": "^7.2.1",
     "lodash": "^4.17.4",
-    "mongoose": "^4.11.9",
+    "mongoose": "^5.7.5",
     "ws": "^7.0.0"
   }
 }
