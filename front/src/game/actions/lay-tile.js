@@ -129,7 +129,7 @@ function updatePlayerOnPatternLineTargetted(state, player) {
     }
   }
 
-  const newPatternLines = updatePatternLines({patternLineId, newPatternLine}, player)
+  const newPatternLines = updatePatternLines({patternLineId, newPatternLine}, player);
 
   return {
     ...player,
