@@ -78,3 +78,6 @@ pids
 .node_repl_history
 
 front/main.js
+
+# Rust
+py/target
