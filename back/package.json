@@ -25,6 +25,7 @@
     "body-parser": "^1.17.2",
     "bson-objectid": "^1.1.5",
     "config": "^1.26.2",
+    "json-server": "^0.16.1",
     "koa": "^2.3.0",
     "koa-better-body": "^3.0.4",
     "koa-body": "^2.3.0",
