@@ -2,50 +2,22 @@ use std::fmt;
 use itertools::Itertools;
 use yaml_rust::yaml;
 
-
-use super::{
+use super::MAX_PENALTY_COUNT;
+use super::elements::{
   Action,
-  ActionResult,
-  Bag,
   Board,
   ColourGroup,
   ExtendedColour,
   ExtendedColourGroup,
   PatternLine,
-  Player,
   Pick,
   PickPlace,
-  MAX_PENALTY_COUNT,
   Round,
-  Table
 };
 
-#[derive(Debug)]
-pub struct Game {
-  bag: Bag,
-  players: Vec<Player>,
-  round: Round
-}
+use super::Game;
 
-impl fmt::Display for Game {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    let formatted_players = self.players
-      .iter()
-      .format_with("\n", |factory, f| {
-        f(&factory)
-      });
-
-    write!(
-      f,
-      "bag: {}\nround: {}\nplayers: {}",
-      self.bag,
-      self.round,
-      formatted_players
-    )
-  }
-}
-
-fn add_penalty(board: &mut Board, penalty: ExtendedColourGroup) -> () {
+pub fn add_penalty(board: &mut Board, penalty: ExtendedColourGroup) -> () {
   if penalty.count == 0 {
     return;
   }
@@ -78,7 +50,7 @@ fn add_penalties_to_player_board(board: &mut Board, penalties: Vec<ExtendedColou
   }
 }
 
-fn get_penalty_count(game: &mut Game, action: &Action, picked_colour_group: ColourGroup) -> u8 {
+pub fn get_penalty_count(game: &mut Game, action: &Action, picked_colour_group: ColourGroup) -> u8 {
   let player_board = &mut game.players[action.player_id].board;
   let found_pattern_line = player_board
     .get_pattern_line_mut(action.pattern_line_id);
@@ -127,14 +99,14 @@ fn add_pick(game: &mut Game, action: &Action, pick: Pick) -> Vec<ExtendedColourG
   penalties
 }
 
-fn add_pick_to_player_board(game: &mut Game, action: &Action, pick: Pick) -> () {
+pub fn add_pick_to_player_board(game: &mut Game, action: &Action, pick: Pick) -> () {
   let penalties = add_pick(game, &action, pick);
 
   let player_board = &mut game.players[action.player_id].board;
   add_penalties_to_player_board(player_board, penalties);
 }
 
-fn retrieve_pick(game: &mut Game, action: &Action) -> Pick {
+pub fn retrieve_pick(game: &mut Game, action: &Action) -> Pick {
   let mut has_marker = false;
   let picked_place = match action.picked_place {
     PickPlace::Center => {
@@ -169,75 +141,18 @@ fn retrieve_pick(game: &mut Game, action: &Action) -> Pick {
   }
 }
 
-impl Game {
-  fn new(player_count: usize) -> Self {
-    let bag = Bag::new();
-
-    let mut players = vec!();
-    for _ in 0..player_count {
-      players.push(Player::new());
+pub fn tile_walls(game: &mut Game) -> () {
+    for player in &mut game.players {
+        player.tile_wall();
     }
-
-    let round = Round{
-      id: 0,
-      first_player: 0,
-      marker: None,
-      table: Table::new(player_count)
-    };
-
-    Game{
-      bag,
-      players,
-      round
-    }
-  }
-
-  fn load_from_yaml<T : AsRef<str>>(game_yaml : yaml::Yaml) -> Result<Self, Box<dyn std::error::Error>> {
-    let res = Game::new(1);
-    res.
-
-    Result::Ok(res)
-  }
-
-  fn is_ended(&self) -> bool {
-    self.players
-      .iter()
-      .any(|player| player.is_ended())
-  }
-
-  fn prepare_round(&mut self) -> Round {
-    for factory_id in 0..self.round.table.factories.len() {
-      let colour_groups = self.bag.pop(4);
-
-      self.round.table.factories[factory_id] = colour_groups;
-    }
-
-    self.round.clone()
-  }
-
-  fn tile_walls(&mut self) -> () {
-    for player in &mut self.players {
-      player.tile_wall();
-    }
-  }
-
-  pub fn apply_action(&mut self, action: Action) -> ActionResult {
-    let pick = retrieve_pick(self, &action);
-    add_pick_to_player_board(self, &action, pick);
-
-    if !self.round.table.is_empty() {
-      return ActionResult::Pick;
-    }
-
-    self.tile_walls();
-
-    if self.is_ended() {
-      return ActionResult::End;
-    }
-
-    ActionResult::NewRound(self.prepare_round())
-  }
 }
 
-#[cfg(test)]
-mod test;
+pub fn prepare_round(game: &mut Game) -> Round {
+    for factory_id in 0..game.round.table.factories.len() {
+        let colour_groups = game.bag.pop(4);
+
+        game.round.table.factories[factory_id] = colour_groups;
+    }
+
+    game.round.clone()
+}
