@@ -1,0 +1,14 @@
+TileGroup:
+  colour: Colour
+  count
+
+board:
+  table: [TileGroup]
+
+
+players:
+-
+  id: int
+  name: string
+  score: int
+
