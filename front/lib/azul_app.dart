@@ -1,6 +1,9 @@
 import 'package:redux/redux.dart';
+import "package:flutter_redux/flutter_redux.dart";
 import 'package:flutter/material.dart';
 
+import 'package:azul_client/redux/app_state.dart';
+import 'package:azul_client/redux/app_reducer.dart';
 import 'package:azul_client/presentation/game/screen.dart';
 
 enum Actions { Increment }
@@ -19,18 +22,20 @@ class AzulApp extends StatefulWidget {
 }
 
 class _AppState extends State<AzulApp> {
-  Store<int> store;
+  Store<AppState> store;
 
   @override
   void initState() {
     super.initState();
-    store = Store<int>(counterReducer, initialState: 0);
+    store = Store<AppState>(appReducer, initialState: AppState.init());
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Welcome to Flutter',
-        home: Container(color: Colors.brown, child: GameScreen()));
+    return StoreProvider(
+        store: store,
+        child: MaterialApp(
+            title: 'Welcome to Flutter',
+            home: Container(color: Colors.brown, child: GameScreen())));
   }
 }
