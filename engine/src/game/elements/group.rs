@@ -7,7 +7,7 @@ use super::{
 
 #[repr(C)]
 #[derive(Clone, Debug)]
-struct Group<T> {
+pub struct Group<T> {
   pub colour: T,
   pub count: u8,
 }

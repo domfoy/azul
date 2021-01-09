@@ -8,7 +8,7 @@ use super::{
 #[repr(C)]
 #[derive(Debug)]
 pub struct Player {
-  board: Board,
+  pub board: Board,
   score: i8,
 }
 

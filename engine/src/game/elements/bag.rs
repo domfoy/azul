@@ -35,7 +35,7 @@ impl Bag {
     Self(bag)
   }
 
-  fn pop_one(&mut self) -> Colour {
+  pub fn pop_one(&mut self) -> Colour {
     let mut rng = rand::thread_rng();
 
     let max = self.0
@@ -57,7 +57,7 @@ impl Bag {
     bag_iterator.colour
   }
 
-  fn pop(&mut self, count: usize) -> Vec<ColourGroup> {
+  pub fn pop(&mut self, count: usize) -> Vec<ColourGroup> {
     let mut colour_groups: Vec<ColourGroup> = vec!();
 
     let left = self.0

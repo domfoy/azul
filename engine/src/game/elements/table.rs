@@ -9,8 +9,8 @@ use super::{
 #[repr(C)]
 #[derive(Clone, Debug)]
 pub struct Table {
-  center: Vec<ColourGroup>,
-  factories: Vec<Vec<ColourGroup>>,
+  pub center: Vec<ColourGroup>,
+  pub factories: Vec<Vec<ColourGroup>>,
 }
 
 impl fmt::Display for Table {

@@ -10,8 +10,7 @@ use elements::{
   ActionResult,
   Bag,
   Player,
-  Round,
-  Table
+  Round
 };
 
 const COLOUR_COUNT : usize = 5;
@@ -52,13 +51,7 @@ impl Game {
       players.push(Player::new());
     }
 
-    let round = Round{
-      id: 0,
-      first_player: 0,
-      marker: None,
-      table: Table::new(player_count)
-    };
-
+    let round = Round::new(player_count);
     Game{
       bag,
       players,
@@ -80,13 +73,13 @@ impl Game {
       return ActionResult::Pick;
     }
 
-    logic::tile_walls(&mut self);
+    logic::tile_walls(self);
 
     if self.is_ended() {
       return ActionResult::End;
     }
 
-    ActionResult::NewRound(logic::prepare_round(&mut self))
+    ActionResult::NewRound(logic::prepare_round(self))
   }
 }
 

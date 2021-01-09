@@ -1,4 +1,5 @@
 use std::fmt;
+use std::slice::Iter;
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
