@@ -5,7 +5,7 @@ use super::*;
 #[test]
 fn game_is_initiated() {
   let mut game = Game::new(2);
-  game.prepare_round();
+  let current_round = game.prepare_round();
 
   println!("{}", &game);
   assert_eq!(game.round.table.factories[0].len() > 1, true);
@@ -16,11 +16,11 @@ fn game_is_initiated() {
   let action = Action{
     colour,
     pattern_line_id: 3,
-    picked_place: PickPlace::Factory(0),
+    picked_place: PickedPlace::Factory(0),
     player_id: 0,
   };
 
-  game.apply_action(action);
+  game.step(action);
 
   println!("{}", &game);
 
@@ -44,7 +44,7 @@ fn run_actions() {
 
   let mut yaml_glob_pattern = std::env::current_dir()
     .unwrap();
-  yaml_glob_pattern.push("src/game/logic/data/*.yaml");
+  yaml_glob_pattern.push("src/game/test/data/*.yaml");
   let yaml_glob_pattern = yaml_glob_pattern.as_os_str().to_str().unwrap();
 
   let entries = glob(&yaml_glob_pattern).unwrap();
@@ -57,8 +57,6 @@ fn run_actions() {
     let file_yaml = yaml::YamlLoader::load_from_str(&file).unwrap();
 
     Game::load_from_yaml(&file_yaml[0].as_hash()[&yaml::Yaml::from_str("game")])
-
-    print!("{:?}", &file);
   }
 }
 

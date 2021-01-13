@@ -50,11 +50,11 @@ impl fmt::Display for Board {
 }
 
 impl Board {
-//   pub fn get_pattern_line(&self, index: usize) -> Option<&PatternLine> {
-//     self.pattern_lines
-//       .iter()
-//       .find(|pattern_line| pattern_line.index == index)
-//   }
+  pub fn get_pattern_line(&self, index: usize) -> Option<&PatternLine> {
+    self.pattern_lines
+      .iter()
+      .find(|pattern_line| pattern_line.index == index)
+  }
   pub fn get_pattern_line_mut(&mut self, index: usize) -> Option<&mut PatternLine> {
     self.pattern_lines
       .iter_mut()

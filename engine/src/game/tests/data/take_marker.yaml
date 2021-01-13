@@ -12,7 +12,7 @@ game:
     - C4
     - A1 B1 D2
   player:
-    patter_lines:
+    pattern_lines:
       -
         id: 3
         content: A2

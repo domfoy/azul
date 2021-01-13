@@ -10,8 +10,10 @@ use elements::{
   ActionResult,
   Bag,
   Player,
-  Round
+  Round,
 };
+
+pub use elements::PickedPlace;
 
 const COLOUR_COUNT : usize = 5;
 const MAX_PENALTY_COUNT : u8 = 8;
@@ -65,11 +67,14 @@ impl Game {
       .any(|player| player.is_ended())
   }
 
-  pub fn step(&mut self, action: Action) -> ActionResult {
-    let pick = logic::retrieve_pick(self, &action);
-    logic::add_pick_to_player_board(self, &action, pick);
+  pub fn prepare_round(&mut self) -> Round {
+    logic::prepare_round(self)
+  }
 
-    if !self.round.table.is_empty() {
+  pub fn step(&mut self, action: Action) -> ActionResult {
+    logic::add_action(self, &action);
+
+    if self.round.is_factory_offer_ended() {
       return ActionResult::Pick;
     }
 
@@ -84,4 +89,12 @@ impl Game {
 }
 
 #[cfg(test)]
-mod test;
+mod tests;
+
+// #[cfg(test)]
+// mod tests {
+//     #[test]
+//     fn it_works() {
+//         assert_eq!(2 + 2, 4);
+//     }
+// }

@@ -11,7 +11,7 @@ use super::{
 
 #[repr(C)]
 #[derive(Debug)]
-pub struct Bag(Vec<ColourGroup>);
+pub struct Bag(pub Vec<ColourGroup>);
 
 impl fmt::Display for Bag {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

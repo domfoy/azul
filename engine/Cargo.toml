@@ -9,7 +9,6 @@ edition = "2018"
 [lib]
 name = "azul_engine_ffi"
 crate-type = ["cdylib"]
-test = false
 doctest = false
 bench = false
 

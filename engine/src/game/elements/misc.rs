@@ -8,7 +8,7 @@ use super::{
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub enum PickPlace {
+pub enum PickedPlace {
     Center,
     Factory(usize)
 }
@@ -21,7 +21,7 @@ pub struct Pick {
 pub struct Action {
     pub colour: Colour,
     pub pattern_line_id: usize,
-    pub picked_place: PickPlace,
+    pub picked_place: PickedPlace,
     pub player_id: usize,
 }
 #[repr(C)]
@@ -41,6 +41,18 @@ impl Round {
             marker: None,
             table: Table::new(player_count)
         }
+    }
+
+    pub fn is_factory_offer_ended(&self) -> bool {
+        if self.table.center.len() > 0 {
+            return false;
+        }
+
+        let non_empty_factory = self.table.factories
+                .iter()
+                .find(|factory| factory.len() > 0);
+
+        non_empty_factory.is_none()
     }
 }
 
