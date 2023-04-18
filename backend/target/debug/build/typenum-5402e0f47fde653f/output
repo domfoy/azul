@@ -1,0 +1,2 @@
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/quentin/dev/azul/backend/target/debug/build/typenum-5402e0f47fde653f/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/home/quentin/dev/azul/backend/target/debug/build/typenum-5402e0f47fde653f/out/op.rs

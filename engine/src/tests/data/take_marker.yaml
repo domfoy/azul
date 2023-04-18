@@ -1,0 +1,36 @@
+action:
+  pick_place: center
+  pattern_line_id: 3
+  colour: A
+  count: 3
+
+game:
+  marker: null
+  table:
+    center: M A3 B2
+    factories:
+    - A2 B1
+    - C4
+    - A1 B1 D2
+  player:
+    pattern_lines:
+      -
+        id: 3
+        content: A2
+    floor_line: A2
+
+expected:
+  game:
+    marker: 0
+  table:
+    - A3 B2
+    - A2 B1
+    - C4
+    - A1 B1 D2
+  player:
+    patter_lines:
+      -
+        id: 3
+        content: A4
+    floor_line: A2 M A2
+
